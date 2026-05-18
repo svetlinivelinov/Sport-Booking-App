@@ -17,6 +17,7 @@ The app must be multi-sport and easy to rebrand. Never assume only one sport.
 	- apps/mobile (Expo app)
 	- packages/shared (shared types, validation, constants)
 - Keep business logic in services.
+- Use modular design: split the app into self-contained components/modules and avoid large, highly coupled files.
 - Expose REST API endpoints for mobile app consumption.
 - Prefer Server Actions only for web-specific interactions.
 - Keep core domain generic and sport-agnostic.
@@ -43,6 +44,11 @@ The app must be multi-sport and easy to rebrand. Never assume only one sport.
 - Favor reusable UI components and keep styling token-driven.
 - Add short, meaningful comments only around complex logic.
 - Avoid hardcoded sport names in core code paths, database schema, and API contracts.
+
+## User Interface Guidelines
+- Implement modern, responsive UI for desktop and mobile web.
+- Prefer server-rendered components in Next.js for data fetching and content rendering.
+- Use client components only for browser interaction and form handling.
 
 ## Workflow
 - Work in small vertical slices: schema -> service -> API -> web screen -> mobile screen.

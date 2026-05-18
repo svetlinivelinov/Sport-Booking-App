@@ -1,8 +1,8 @@
 {
-  "name": "sport-booking-app-v2",
+  "name": "sport-booking-app-v1",
   "version": "0.1.0",
   "private": true,
-  "description": "Capstone monorepo bootstrap: Next.js web/backend + Expo mobile + shared packages",
+  "description": "Capstone monorepo: Next.js web/backend + Expo mobile + shared packages",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -11,6 +11,10 @@
     "dev:web": "npm run dev --workspace apps/web",
     "dev:mobile": "npm run start --workspace apps/mobile",
     "build:web": "npm run build --workspace apps/web",
+    "build:mobile:web": "npm run export:web --workspace apps/mobile",
+    "db:migrate": "npm run db:migrate --workspace apps/web",
+    "db:seed:small": "npm run db:seed:small --workspace apps/web",
+    "db:seed:large": "npm run db:seed:large --workspace apps/web",
     "lint:web": "npm run lint --workspace apps/web"
   },
   "engines": {

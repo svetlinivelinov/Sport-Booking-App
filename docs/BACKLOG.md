@@ -2,23 +2,23 @@
 
 ## Bootstrap
 
-- [ ] Initialize Next.js app in `apps/web`
-- [ ] Initialize Expo app in `apps/mobile`
-- [ ] Add shared package setup in `packages/shared`
+- [x] Initialize Next.js app in `apps/web`
+- [x] Initialize Expo app in `apps/mobile`
+- [x] Add shared package setup in `packages/shared`
 
 ## Backend and DB
 
-- [ ] Configure Drizzle in `apps/web`
-- [ ] Add first migrations for core tables
-- [ ] Add seed script with small + large dataset modes
-- [ ] Add paging params to list endpoints (`page`, `pageSize`)
+- [x] Configure Drizzle in `apps/web`
+- [x] Add first migrations for core tables
+- [x] Add seed script with small + large dataset modes
+- [x] Add paging params to list endpoints (`page`, `pageSize`)
 
 ## Auth and Roles
 
-- [ ] Register/login/logout routes
-- [ ] JWT issuance and verification middleware
-- [ ] Password hashing and validation policy
-- [ ] Admin role enforcement for privileged routes
+- [x] Register/login/logout routes
+- [x] JWT issuance and verification middleware
+- [x] Password hashing and validation policy
+- [x] Admin role enforcement for privileged routes
 
 ## Core Features
 
@@ -29,16 +29,16 @@
 
 ## Web
 
-- [ ] Deliver first 6 web screens
-- [ ] Deliver admin panel screens
-- [ ] Reach 10+ total web screens with responsive behavior
+- [x] Deliver first 6 web screens
+- [x] Deliver admin panel screens
+- [x] Reach 10+ total web screens with responsive behavior
 
 ## Mobile
 
-- [ ] Deliver login + dashboard
-- [ ] Deliver events/courts + booking flow
-- [ ] Deliver my bookings + profile
-- [ ] Reach 5+ total mobile screens
+- [x] Deliver login + dashboard
+- [x] Deliver events/courts + booking flow
+- [x] Deliver my bookings + profile
+- [x] Reach 5+ total mobile screens
 
 ## Delivery
 

@@ -11,6 +11,11 @@ Sport Booking App v1 is a capstone project that must deliver:
 
 The product must be sport-agnostic. It should support multiple sports (for example padel, football, tennis) through configuration and pluggable rules, without codebase-wide renaming.
 
+## Technologies
+- Next.js + React + Tailwind
+- Neon PostgreSQL + Drizzle ORM
+- JWT + bcrypt/argon2
+
 ## Source of Truth
 - Project rules: AGENTS.md and .github/copilot-instructions.md
 - Delivery plan: docs/IMPLEMENTATION_PLAN.md
@@ -34,6 +39,7 @@ Implement a monorepo with this target shape:
 8. Use neutral domain names in code and DB (for example activity/session/venue/participant/matchup) instead of hardcoded single-sport terms.
 9. Store sport-specific rules in configurable modules (scoring, scheduling, ranking), not in generic services.
 10. Keep app branding configurable (name, labels, theme tokens) to allow easy sport or product renaming.
+11. Use modular design: split features into self-contained components/modules and avoid oversized files.
 
 ## Delivery Targets
 - Web app: at least 10 screens
@@ -58,3 +64,8 @@ Use small vertical slices:
 - Keep env variables in .env files excluded from source control.
 - Avoid destructive file operations unless explicitly requested.
 - Preserve existing user files unless a migration/refactor is agreed.
+
+## UI Guidelines
+- Build modern, responsive UI for desktop and mobile layouts.
+- Prefer server-rendered components in Next.js for data-driven screens.
+- Use client components only for browser interaction, local UI state, and form behavior.
