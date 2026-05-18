@@ -3,11 +3,13 @@
 This file defines project-wide instructions for AI coding agents.
 
 ## Project Context
-Sport Booking App v1 is a capstone project that must deliver:
+Sport Booking App v2 is a capstone project that must deliver:
 - Next.js web app with backend APIs
 - Expo mobile app
 - Neon PostgreSQL with Drizzle ORM
 - JWT-based authentication and role-based authorization
+
+The product must be sport-agnostic. It should support multiple sports (for example padel, football, tennis) through configuration and pluggable rules, without codebase-wide renaming.
 
 Legacy implementation and design materials are stored in Support Folder and used strictly as references.
 
@@ -31,6 +33,9 @@ Implement a monorepo with this target shape:
 5. Add server-side paging for list endpoints.
 6. Keep reference files read-only in Support Folder.
 7. Re-implement legacy logic in TypeScript; do not copy old scripts as production code.
+8. Use neutral domain names in code and DB (for example activity/session/venue/participant/matchup) instead of hardcoded single-sport terms.
+9. Store sport-specific rules in configurable modules (scoring, scheduling, ranking), not in generic services.
+10. Keep app branding configurable (name, labels, theme tokens) to allow easy sport or product renaming.
 
 ## Delivery Targets
 - Web app: at least 10 screens

@@ -1,7 +1,9 @@
 # Sport Booking App v2 - Copilot Instructions
 
 ## Mission
-Build a new capstone-compliant v1 app from scratch, using the files under Support Folder only as reference material.
+Build a new capstone-compliant v2 app from scratch, using the files under Support Folder only as reference material.
+
+The app must be multi-sport and easy to rebrand. Never assume only one sport.
 
 ## Required Stack
 - Next.js + React + TypeScript + Tailwind for web and backend
@@ -17,6 +19,9 @@ Build a new capstone-compliant v1 app from scratch, using the files under Suppor
 - Keep business logic in services.
 - Expose REST API endpoints for mobile app consumption.
 - Prefer Server Actions only for web-specific interactions.
+- Keep core domain generic and sport-agnostic.
+- Implement sport-specific behavior through pluggable modules/configs (rules, scoring, ranking, scheduling).
+- Keep labels/branding/theme tokens configurable to support easy app renaming and sport switching.
 
 ## Reference Folder Policy
 - Treat Support Folder as read-only references.
@@ -38,6 +43,7 @@ Build a new capstone-compliant v1 app from scratch, using the files under Suppor
 - Centralize env handling and never hardcode secrets.
 - Favor reusable UI components and keep styling token-driven.
 - Add short, meaningful comments only around complex logic.
+- Avoid hardcoded sport names in core code paths, database schema, and API contracts.
 
 ## Workflow
 - Work in small vertical slices: schema -> service -> API -> web screen -> mobile screen.
