@@ -15,7 +15,9 @@
     "db:migrate": "npm run db:migrate --workspace apps/web",
     "db:seed:small": "npm run db:seed:small --workspace apps/web",
     "db:seed:large": "npm run db:seed:large --workspace apps/web",
-    "lint:web": "npm run lint --workspace apps/web"
+    "lint:web": "npm run lint --workspace apps/web",
+    "check:web-env": "powershell -ExecutionPolicy Bypass -File scripts/check-web-env.ps1",
+    "test:smoke": "powershell -ExecutionPolicy Bypass -File scripts/test-current-app.ps1"
   },
   "engines": {
     "node": ">=20"

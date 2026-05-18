@@ -6,7 +6,7 @@ This document defines the minimum steps to complete the final plan item: paging,
 
 ### apps/web
 
-- `DATABASE_URL`: Neon Postgres connection string
+- `DATABASE_URL`: Railway/Neon Postgres connection string
 - `JWT_SECRET`: random long secret for auth signing
 
 Create `apps/web/.env` for local development, starting from `apps/web/.env.example`.
@@ -19,6 +19,8 @@ Create `apps/mobile/.env` from `apps/mobile/.env.example` before building export
 
 ## Local Validation Flow
 
+0. Validate env configuration:
+   - `npm run check:web-env`
 1. Run migrations:
    - `npm run db:migrate`
 2. Seed a small dataset:
@@ -29,6 +31,8 @@ Create `apps/mobile/.env` from `apps/mobile/.env.example` before building export
    - `GET /api/sessions?page=1&pageSize=20`
 5. Validate health endpoint:
    - `GET /api/health`
+6. Run smoke checks against running web + mobile web servers:
+   - `npm run test:smoke`
 
 ## Paging Acceptance
 
@@ -58,6 +62,42 @@ If Railway cannot set project root cleanly, use workspace-aware commands from re
 5. Deploy and validate `/api/health` and `/api/sessions?page=1&pageSize=20`
 
 Repository already includes a baseline Railway service config at `railway.toml`.
+
+## Recommended Setup for This Project
+
+Use Railway for database and Netlify for hosting.
+
+### 1. Railway Postgres (Database)
+
+1. Create a Railway project and add a Postgres service.
+2. Copy the Postgres connection string.
+3. Ensure SSL is enabled (`sslmode=require` in the URL when needed).
+4. Use this value as `DATABASE_URL` for local and Netlify environments.
+
+### 2. Netlify for Next.js Web App (apps/web)
+
+Create a Netlify site connected to this repository with these settings:
+
+1. Base directory: `apps/web`
+2. Build command: `npm run build`
+3. Publish directory: leave empty for Next.js runtime
+4. Environment variables:
+   - `DATABASE_URL` (from Railway)
+   - `JWT_SECRET` (strong random secret)
+   - `NODE_ENV=production`
+5. Deploy and validate:
+   - `/api/health`
+   - `/api/sessions?page=1&pageSize=20`
+
+### 3. Netlify for Mobile Web Export (Optional Second Site)
+
+If you want the Expo web build hosted on Netlify as a separate frontend:
+
+1. Run `npm run build:mobile:web`.
+2. Create a second Netlify site.
+3. Set publish directory to `apps/mobile/dist`.
+4. Set `EXPO_PUBLIC_API_BASE_URL` to your deployed Next.js URL.
+5. Redeploy mobile site after changing API base URL.
 
 ## Mobile Web Deployment (Expo Export)
 

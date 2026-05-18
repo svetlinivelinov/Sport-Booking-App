@@ -20,10 +20,18 @@ const tabs: Array<{ key: ScreenKey; label: string }> = [
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenKey>('login');
+  const [authToken, setAuthToken] = useState<string | null>(null);
 
   const content = useMemo(() => {
     if (screen === 'login') {
-      return <LoginScreen onContinue={() => setScreen('dashboard')} />;
+      return (
+        <LoginScreen
+          onContinue={(token) => {
+            setAuthToken(token);
+            setScreen('dashboard');
+          }}
+        />
+      );
     }
     if (screen === 'dashboard') {
       return <DashboardScreen />;
@@ -41,7 +49,9 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Sport Booking App v1</Text>
-        <Text style={styles.headerSubtitle}>Global theme and MVP screen flow</Text>
+        <Text style={styles.headerSubtitle}>
+          {authToken ? 'Authenticated with Bearer token flow' : 'Global theme and MVP screen flow'}
+        </Text>
       </View>
 
       <View style={styles.card}>{content}</View>

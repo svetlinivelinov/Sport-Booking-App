@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     role: createdUser.role as "user" | "admin",
   });
 
-  const response = NextResponse.json({ user: createdUser }, { status: 201 });
+  const response = NextResponse.json({ token, user: createdUser }, { status: 201 });
   response.cookies.set(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

@@ -13,6 +13,7 @@ The product must be sport-agnostic. It should support multiple sports (for examp
 
 ## Technologies
 - Next.js + React + Tailwind
+- React Native + Expo (prefer Expo Router for mobile navigation)
 - Neon PostgreSQL + Drizzle ORM
 - JWT + bcrypt/argon2
 
@@ -40,6 +41,8 @@ Implement a monorepo with this target shape:
 9. Store sport-specific rules in configurable modules (scoring, scheduling, ranking), not in generic services.
 10. Keep app branding configurable (name, labels, theme tokens) to allow easy sport or product renaming.
 11. Use modular design: split features into self-contained components/modules and avoid oversized files.
+12. Keep mobile API consumption aligned with REST endpoints under apps/web/src/app/api.
+13. Support Bearer token auth for mobile API clients; keep token verification centralized in auth services.
 
 ## Delivery Targets
 - Web app: at least 10 screens
@@ -69,3 +72,5 @@ Use small vertical slices:
 - Build modern, responsive UI for desktop and mobile layouts.
 - Prefer server-rendered components in Next.js for data-driven screens.
 - Use client components only for browser interaction, local UI state, and form behavior.
+- Mobile navigation should use Expo Router stack patterns as screens grow.
+- Any native-style alert/confirm flow must have a Web fallback (modal dialog or equivalent).
