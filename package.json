@@ -8,11 +8,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:web": "echo Initialize apps/web first",
-    "dev:mobile": "echo Initialize apps/mobile first",
-    "build": "echo Configure build orchestration after app initialization",
-    "lint": "echo Configure lint after app initialization",
-    "typecheck": "echo Configure typecheck after app initialization"
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:mobile": "npm run start --workspace apps/mobile",
+    "build:web": "npm run build --workspace apps/web",
+    "lint:web": "npm run lint --workspace apps/web"
   },
   "engines": {
     "node": ">=20"

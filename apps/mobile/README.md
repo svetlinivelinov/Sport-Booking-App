@@ -1,15 +1,14 @@
 # apps/mobile
 
-Target: Expo React Native app for end-user mobile flows.
+Expo React Native client for Sport Booking App v2.
 
-## Planned Responsibilities
+## Run
 
-- Mobile screens (minimum 5)
-- Authentication and profile flows
-- Court/event browsing and booking actions
-- My bookings/results views
-- REST API integration with apps/web backend
+- `npm run start --workspace apps/mobile`
+- `npm run android --workspace apps/mobile`
+- `npm run ios --workspace apps/mobile`
+- `npm run web --workspace apps/mobile`
 
-## Suggested Next Command
+## Scope
 
-Initialize an Expo TypeScript app in this folder.
+Implement the core end-user flows for capstone requirements (5+ screens), consuming REST APIs from `apps/web`.
