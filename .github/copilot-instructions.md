@@ -1,7 +1,7 @@
-# Sport Booking App v2 - Copilot Instructions
+# Sport Booking App v1 - Copilot Instructions
 
 ## Mission
-Build a new capstone-compliant v2 app from scratch, using the files under Support Folder only as reference material.
+Build a capstone-compliant v1 app from scratch in this monorepo.
 
 The app must be multi-sport and easy to rebrand. Never assume only one sport.
 
@@ -23,11 +23,10 @@ The app must be multi-sport and easy to rebrand. Never assume only one sport.
 - Implement sport-specific behavior through pluggable modules/configs (rules, scoring, ranking, scheduling).
 - Keep labels/branding/theme tokens configurable to support easy app renaming and sport switching.
 
-## Reference Folder Policy
-- Treat Support Folder as read-only references.
-- Never move runtime code into Support Folder.
-- Do not copy old JS/HTML directly into production apps; re-implement in TypeScript.
-- Reuse domain concepts, flows, schema ideas, and UI direction only.
+## Repository Policy
+- Keep production code in apps/web, apps/mobile, and packages/shared.
+- Keep architecture and docs self-contained in this repository.
+- Implement features in TypeScript with reusable, testable modules.
 
 ## Capstone Guardrails
 - Minimum 10 web screens.

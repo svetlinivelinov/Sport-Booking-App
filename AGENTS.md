@@ -1,9 +1,9 @@
-# AGENTS.md - Sport Booking App v2
+# AGENTS.md - Sport Booking App v1
 
 This file defines project-wide instructions for AI coding agents.
 
 ## Project Context
-Sport Booking App v2 is a capstone project that must deliver:
+Sport Booking App v1 is a capstone project that must deliver:
 - Next.js web app with backend APIs
 - Expo mobile app
 - Neon PostgreSQL with Drizzle ORM
@@ -11,12 +11,10 @@ Sport Booking App v2 is a capstone project that must deliver:
 
 The product must be sport-agnostic. It should support multiple sports (for example padel, football, tennis) through configuration and pluggable rules, without codebase-wide renaming.
 
-Legacy implementation and design materials are stored in Support Folder and used strictly as references.
-
 ## Source of Truth
-- Functional and scoring requirements: Support Folder/requirements/NEW CAPSTONE.md
-- Gap checklist and missing scope: Support Folder/requirements/NEW Project.md
-- Reuse mapping: SOURCE_MAP.md
+- Project rules: AGENTS.md and .github/copilot-instructions.md
+- Delivery plan: docs/IMPLEMENTATION_PLAN.md
+- Scope and task tracking: docs/SCREEN_INVENTORY.md and docs/BACKLOG.md
 
 ## Required Repository Direction
 Implement a monorepo with this target shape:
@@ -31,8 +29,8 @@ Implement a monorepo with this target shape:
 3. Use DTO validation for all API input.
 4. Implement JWT auth, password hashing, and role checks.
 5. Add server-side paging for list endpoints.
-6. Keep reference files read-only in Support Folder.
-7. Re-implement legacy logic in TypeScript; do not copy old scripts as production code.
+6. Keep app code and docs self-contained in the monorepo.
+7. Re-implement features in TypeScript and keep architecture consistent across web/mobile/shared.
 8. Use neutral domain names in code and DB (for example activity/session/venue/participant/matchup) instead of hardcoded single-sport terms.
 9. Store sport-specific rules in configurable modules (scoring, scheduling, ranking), not in generic services.
 10. Keep app branding configurable (name, labels, theme tokens) to allow easy sport or product renaming.

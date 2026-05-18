@@ -1,6 +1,6 @@
 # apps/mobile
 
-Expo React Native client for Sport Booking App v2.
+Expo React Native client for Sport Booking App v1.
 
 ## Run
 

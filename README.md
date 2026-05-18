@@ -1,10 +1,9 @@
-# Sport Booking App v2
+# Sport Booking App v1
 
-Capstone-ready monorepo bootstrap for a multi-platform sport booking app.
+Capstone-ready monorepo for a multi-platform sport booking app.
 
 ## Repository Status
 
-- Reference-only materials are under `Support Folder/`.
 - Production code will be developed in:
   - `apps/web`
   - `apps/mobile`
@@ -19,15 +18,13 @@ apps/
 packages/
   shared/
 docs/
-Support Folder/
 ```
 
 ## Source of Truth
 
-- Requirements: `Support Folder/requirements/NEW CAPSTONE.md`
-- Gap analysis: `Support Folder/requirements/NEW Project.md`
-- Reuse map: `SOURCE_MAP.md`
 - Agent rules: `AGENTS.md` and `.github/copilot-instructions.md`
+- Delivery plan: `docs/IMPLEMENTATION_PLAN.md`
+- Scope and tracking: `docs/SCREEN_INVENTORY.md` and `docs/BACKLOG.md`
 
 ## Next Steps
 

@@ -7,14 +7,13 @@
 
 ## Scope for First Commit
 - Establish project governance and planning artifacts
-- Keep Support Folder as reference-only material
 - Define AI agent instructions and coding guardrails
 
 ## Included in This Baseline
 - AGENTS.md (root)
 - .github/copilot-instructions.md
 - .github/REPO_INFO.md
-- Existing reference materials under Support Folder/
+- Monorepo bootstrap files and planning docs
 
 ## Next Build Milestones
 1. Create monorepo skeleton (apps/web, apps/mobile, packages/shared)
