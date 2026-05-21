@@ -5,6 +5,7 @@
 1. Initialize `apps/web` (Next.js + TypeScript + Tailwind).
 2. Initialize `apps/mobile` (Expo + TypeScript).
 3. Configure monorepo scripts and shared TypeScript config.
+4. Keep agent instruction files aligned (`AGENTS.md`, `.github/copilot-instructions.md`).
 
 ## Phase 2: Data Model and Infrastructure
 
@@ -25,6 +26,7 @@
 1. Register, login, logout endpoints.
 2. Password hashing (bcrypt/argon2) and JWT issue/verify.
 3. Role model (`user`, `admin`) and access enforcement in API + middleware.
+4. Support Bearer token flow for mobile REST API clients.
 
 ## Phase 5: Core Product Features
 
@@ -38,6 +40,7 @@
 1. Deliver at least 10 web screens.
 2. Implement reusable components and responsive design.
 3. Build admin panel for privileged workflows.
+4. Add clear visual cues (icons/effects/states) for UX clarity.
 
 ## Phase 7: Mobile App Delivery
 
@@ -58,3 +61,12 @@
 3. Add demo credentials.
 4. Finalize README, architecture docs, and API notes.
 5. Maintain commit cadence for capstone scoring requirements.
+6. Publish required metadata in `docs/Capstone.md` (repo URL, live URLs, test credentials, author details).
+7. Verify capstone Git history thresholds (minimum 15 commits across at least 3 different days).
+8. Ensure documentation explicitly includes DB schema relationships and local setup steps.
+
+## Phase 10: Optional Bonus Scope
+
+1. Object storage file upload/download flow (for example Cloudflare R2).
+2. Automated tests and GitHub Actions execution.
+3. Automated backup workflow for DB/storage snapshots.

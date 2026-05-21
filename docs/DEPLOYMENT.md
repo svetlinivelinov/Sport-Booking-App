@@ -6,7 +6,7 @@ This document defines the minimum steps to complete the final plan item: paging,
 
 ### apps/web
 
-- `DATABASE_URL`: Railway/Neon Postgres connection string
+- `DATABASE_URL`: Neon Postgres connection string
 - `JWT_SECRET`: random long secret for auth signing
 
 Create `apps/web/.env` for local development, starting from `apps/web/.env.example`.
@@ -42,7 +42,7 @@ Create `apps/mobile/.env` from `apps/mobile/.env.example` before building export
 
 ## Web Deployment (Next.js)
 
-Suggested hosts: Vercel, Netlify, or Railway.
+Suggested hosts: Vercel or Netlify.
 
 1. Connect repository.
 2. Set root/project to `apps/web`.
@@ -51,25 +51,13 @@ Suggested hosts: Vercel, Netlify, or Railway.
 5. Start command: `npm run start`.
 6. Verify `/api/health` and auth endpoints.
 
-### Railway (Monorepo-safe Commands)
-
-If Railway cannot set project root cleanly, use workspace-aware commands from repository root:
-
-1. Build command: `npm run build --workspace apps/web`
-2. Start command: `npm run start --workspace apps/web`
-3. Add env vars: `DATABASE_URL`, `JWT_SECRET`
-4. Set health check path to `/api/health`
-5. Deploy and validate `/api/health` and `/api/sessions?page=1&pageSize=20`
-
-Repository already includes a baseline Railway service config at `railway.toml`.
-
 ## Recommended Setup for This Project
 
-Use Railway for database and Netlify for hosting.
+Use Neon for database and Netlify for hosting.
 
-### 1. Railway Postgres (Database)
+### 1. Neon Postgres (Database)
 
-1. Create a Railway project and add a Postgres service.
+1. Create a Neon project and database.
 2. Copy the Postgres connection string.
 3. Ensure SSL is enabled (`sslmode=require` in the URL when needed).
 4. Use this value as `DATABASE_URL` for local and Netlify environments.
@@ -82,7 +70,7 @@ Create a Netlify site connected to this repository with these settings:
 2. Build command: `npm run build`
 3. Publish directory: leave empty for Next.js runtime
 4. Environment variables:
-   - `DATABASE_URL` (from Railway)
+   - `DATABASE_URL` (from Neon)
    - `JWT_SECRET` (strong random secret)
    - `NODE_ENV=production`
 5. Deploy and validate:
