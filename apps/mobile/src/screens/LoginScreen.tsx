@@ -5,6 +5,7 @@ import { appTheme } from "@sport-booking/shared";
 
 import { loginWithPassword } from "../lib/authApi";
 import { showAlert } from "../ui/alerts";
+import { mobileFonts } from "../ui/fonts";
 
 interface LoginScreenProps {
   onContinue: (token: string) => void;
@@ -73,15 +74,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: "700",
     color: appTheme.colors.foreground,
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.bold,
   },
   subtitle: {
     fontSize: 14,
     color: appTheme.colors.muted,
     marginBottom: 4,
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.regular,
   },
   input: {
     borderWidth: 1,
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: appTheme.colors.surface,
     color: appTheme.colors.foreground,
+    fontFamily: mobileFonts.regular,
   },
   button: {
     marginTop: 6,
@@ -104,8 +105,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "700",
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.bold,
   },
   secondaryButton: {
     alignItems: "center",
@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: appTheme.colors.primary,
-    fontWeight: "600",
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.semiBold,
   },
 });

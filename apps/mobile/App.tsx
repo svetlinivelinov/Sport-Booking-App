@@ -1,4 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import { Manrope_400Regular, Manrope_600SemiBold, Manrope_700Bold } from '@expo-google-fonts/manrope';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { appTheme } from '@sport-booking/shared';
@@ -7,6 +9,7 @@ import { EventsScreen } from './src/screens/EventsScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { MySessionsScreen } from './src/screens/MySessionsScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { mobileFonts } from './src/ui/fonts';
 
 type ScreenKey = 'login' | 'dashboard' | 'events' | 'my-sessions' | 'profile';
 
@@ -19,6 +22,11 @@ const tabs: Array<{ key: ScreenKey; label: string }> = [
 ];
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Manrope_400Regular,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+  });
   const [screen, setScreen] = useState<ScreenKey>('login');
   const [authToken, setAuthToken] = useState<string | null>(null);
 
@@ -34,16 +42,20 @@ export default function App() {
       );
     }
     if (screen === 'dashboard') {
-      return <DashboardScreen />;
+      return <DashboardScreen token={authToken} />;
     }
     if (screen === 'events') {
-      return <EventsScreen />;
+      return <EventsScreen token={authToken} />;
     }
     if (screen === 'my-sessions') {
-      return <MySessionsScreen />;
+      return <MySessionsScreen token={authToken} />;
     }
-    return <ProfileScreen />;
-  }, [screen]);
+    return <ProfileScreen token={authToken} />;
+  }, [authToken, screen]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -56,7 +68,12 @@ export default function App() {
 
       <View style={styles.card}>{content}</View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabScroll}
+        contentContainerStyle={styles.tabRow}
+      >
         {tabs.map((tab) => {
           const active = tab.key === screen;
           return (
@@ -90,14 +107,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: appTheme.colors.foreground,
     fontSize: 26,
-    fontWeight: '700',
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.bold,
   },
   headerSubtitle: {
     color: appTheme.colors.muted,
     fontSize: 13,
     marginTop: 4,
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.regular,
   },
   card: {
     flex: 1,
@@ -109,11 +125,17 @@ const styles = StyleSheet.create({
   },
   tabRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     paddingTop: 14,
     paddingBottom: 6,
   },
+  tabScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   tab: {
+    flexShrink: 0,
     borderRadius: 999,
     backgroundColor: '#e7edf9',
     paddingHorizontal: 12,
@@ -125,8 +147,7 @@ const styles = StyleSheet.create({
   tabText: {
     color: appTheme.colors.foreground,
     fontSize: 12,
-    fontWeight: '600',
-    fontFamily: appTheme.fonts.sans,
+    fontFamily: mobileFonts.semiBold,
   },
   tabTextActive: {
     color: '#ffffff',

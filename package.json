@@ -8,10 +8,12 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:web:root\" \"npm run dev:mobile:root\"",
+    "dev": "npm run dev:web:root",
+    "dev:all": "concurrently \"npm run dev:web:root\" \"npm run dev:mobile:root\"",
     "dev:clean": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$ports = @(3000,3010,8081,8090); foreach ($p in $ports) { $conns = Get-NetTCPConnection -LocalPort $p -ErrorAction SilentlyContinue | Select-Object -Unique OwningProcess; foreach ($c in $conns) { try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop } catch {} } }; Write-Output 'Dev ports cleaned.'\"",
     "dev:fresh": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run dev:clean; npm run dev\"",
-    "dev:web:root": "npm run dev --workspace apps/web -- --port 3010",
+    "dev:all:fresh": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"npm run dev:clean; npm run dev:all\"",
+    "dev:web:root": "npm run dev --workspace apps/web",
     "dev:mobile:root": "npm run web --workspace apps/mobile -- --port 8090",
     "dev:web": "npm run dev --workspace apps/web",
     "dev:mobile": "npm run start --workspace apps/mobile",

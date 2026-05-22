@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { signAuthToken } from "@/auth/jwt";
 import { verifyPassword } from "@/auth/password";
 import { AUTH_COOKIE_NAME } from "@/auth/session";
+import { corsPreflight, withCors } from "@/app/api/auth/cors";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
 
@@ -18,18 +19,21 @@ export async function POST(request: Request) {
   const password = body.password?.trim();
 
   if (!email || !password) {
-    return NextResponse.json({ error: "email and password are required" }, { status: 400 });
+    return withCors(
+      request,
+      NextResponse.json({ error: "email and password are required" }, { status: 400 }),
+    );
   }
 
   const user = await db.query.users.findFirst({ where: eq(users.email, email) });
 
   if (!user) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return withCors(request, NextResponse.json({ error: "Invalid credentials" }, { status: 401 }));
   }
 
   const passwordOk = await verifyPassword(password, user.passwordHash);
   if (!passwordOk) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return withCors(request, NextResponse.json({ error: "Invalid credentials" }, { status: 401 }));
   }
 
   const token = signAuthToken({
@@ -56,5 +60,9 @@ export async function POST(request: Request) {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  return response;
+  return withCors(request, response);
+}
+
+export async function OPTIONS(request: Request) {
+  return corsPreflight(request);
 }
