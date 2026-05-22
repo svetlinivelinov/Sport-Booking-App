@@ -8,6 +8,8 @@ const appLinks = [
   { href: "/dashboard", label: "Upcoming" },
   { href: "/groups", label: "Groups" },
   { href: "/events", label: "Events" },
+  { href: "/court", label: "Court" },
+  { href: "/results", label: "Results" },
   { href: "/profile", label: "Profile" },
 ];
 

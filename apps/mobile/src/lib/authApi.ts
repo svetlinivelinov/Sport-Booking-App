@@ -51,6 +51,38 @@ interface GroupsResponse {
   error?: string;
 }
 
+export interface ResultSummary {
+  matchupId: string;
+  sessionId: string;
+  sessionTitle: string;
+  roundNumber: number;
+  slotNumber: number;
+  sideAUserIds: string[];
+  sideBUserIds: string[];
+  sideAScore: number;
+  sideBScore: number;
+  winnerSide: "A" | "B" | "draw";
+  submittedAt: string;
+}
+
+export interface LeaderboardSummary {
+  userId: string;
+  displayName: string;
+  wins: number;
+  losses: number;
+  draws: number;
+}
+
+interface ResultsResponse {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  rows: ResultSummary[];
+  leaderboard: LeaderboardSummary[];
+  error?: string;
+}
+
 export async function loginWithPassword(email: string, password: string): Promise<LoginResponse> {
   const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
     method: "POST",
@@ -230,4 +262,36 @@ export async function deleteGroup(token: string, groupId: string): Promise<void>
     const payload = (await response.json()) as { error?: string };
     throw new Error(payload.error || "Unable to delete group");
   }
+}
+
+export async function getResults(
+  token: string,
+  params: { sessionId?: string; page?: number; pageSize?: number } = {},
+): Promise<ResultsResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.sessionId) {
+    searchParams.set("sessionId", params.sessionId);
+  }
+  if (params.page) {
+    searchParams.set("page", String(params.page));
+  }
+  if (params.pageSize) {
+    searchParams.set("pageSize", String(params.pageSize));
+  }
+
+  const query = searchParams.toString();
+  const url = `${apiBaseUrl}/api/results${query ? `?${query}` : ""}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const payload = (await response.json()) as ResultsResponse;
+  if (!response.ok) {
+    throw new Error(payload.error || "Unable to load results");
+  }
+
+  return payload;
 }

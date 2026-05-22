@@ -38,6 +38,8 @@ Create `apps/mobile/.env` from `apps/mobile/.env.example` before building export
 6. Run smoke checks against running web + mobile web servers:
    - `npm run test:smoke`
    - Optional custom URLs: `npm run test:smoke -- -WebUrl http://localhost:3000 -MobileUrl http://localhost:8081`
+   - For this workspace, use explicit URLs to avoid auto-detection issues:
+     - `npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`
 
 ## Paging Acceptance
 
@@ -106,3 +108,8 @@ If you want the Expo web build hosted on Netlify as a separate frontend:
 - Demo credentials
 - 10k+ dataset tested with pagination
 - Commit history requirements satisfied
+
+## Current Local Verification Snapshot
+
+- `npm run check:web-env`: PASS
+- `npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`: PASS

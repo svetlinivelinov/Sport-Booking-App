@@ -1,17 +1,22 @@
 Capstone Project in “Full Stack Apps with AI”
 This project assignment for the course “Full Stack Apps with AI” in SoftUni AI aims to give you practical skills for AI-assisted development of multi-platform full-stack apps with Next.js, React, PostgreSQL and Expo.
-Author
-…
-Email
-…
-GitHub Repo
-…
-Web Project Live URL
-…
-Expo Project Live URL
-…
-Credentials for testing (login + pass)
-…
+
+## Submission Metadata
+
+- Author: TODO
+- Email: TODO
+- GitHub Repo: TODO
+- Web Project Live URL: TODO
+- Expo Project Live URL: TODO
+- Credentials for testing (login + pass): TODO
+
+## Delivery Status (May 22, 2026)
+
+- Local env validation: PASS (`npm run check:web-env`)
+- Local smoke checks: PASS (`npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`)
+- Web deployment: PENDING
+- Expo web export deployment: PENDING
+
 * If you have a good reason to keep your codebase or app private, contact the training team for instructions.
     1. Project Assignment
 Using agentic AI development implement and deploy a fully functional multi-platform full-stack app.

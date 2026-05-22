@@ -22,10 +22,10 @@
 
 ## Core Features
 
-- [ ] Groups CRUD + membership workflows
-- [ ] Events CRUD + join/leave flow
-- [ ] Court/match progression and score submission
-- [ ] Results and leaderboard aggregation
+- [x] Groups CRUD + membership workflows
+- [x] Events CRUD + join/leave flow
+- [x] Court/match progression and score submission
+- [x] Results and leaderboard aggregation
 
 ## Web
 
@@ -45,3 +45,7 @@
 - [ ] Deploy web/backend
 - [ ] Deploy Expo web export
 - [ ] Add demo credentials and final docs
+
+Delivery progress notes:
+- [x] Local env validation command passing (`npm run check:web-env`)
+- [x] Local smoke checks passing with explicit URLs (`npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`)

@@ -10,9 +10,10 @@ import { GroupsScreen } from './src/screens/GroupsScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { MySessionsScreen } from './src/screens/MySessionsScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { ResultsScreen } from './src/screens/ResultsScreen';
 import { mobileFonts } from './src/ui/fonts';
 
-type ScreenKey = 'login' | 'dashboard' | 'groups' | 'events' | 'my-sessions' | 'profile';
+type ScreenKey = 'login' | 'dashboard' | 'groups' | 'events' | 'my-sessions' | 'results' | 'profile';
 
 const tabs: Array<{ key: ScreenKey; label: string }> = [
   { key: 'login', label: 'Login' },
@@ -20,6 +21,7 @@ const tabs: Array<{ key: ScreenKey; label: string }> = [
   { key: 'groups', label: 'Groups' },
   { key: 'events', label: 'Events' },
   { key: 'my-sessions', label: 'My Sessions' },
+  { key: 'results', label: 'Results' },
   { key: 'profile', label: 'Profile' },
 ];
 
@@ -60,8 +62,11 @@ export default function App() {
     if (screen === 'my-sessions') {
       return <MySessionsScreen token={authToken} refreshKey={sessionRefreshKey} onSessionChange={onSessionChange} />;
     }
+    if (screen === 'results') {
+      return <ResultsScreen token={authToken} />;
+    }
     return <ProfileScreen token={authToken} />;
-  }, [authToken, screen]);
+  }, [authToken, screen, sessionRefreshKey]);
 
   if (!fontsLoaded) {
     return null;
