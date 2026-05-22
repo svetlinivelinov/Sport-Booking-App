@@ -115,7 +115,12 @@ export function EventsScreen({ token, refreshKey, onSessionChange }: EventsScree
       <Text style={styles.title}>Events</Text>
       <Text style={styles.subtitle}>Synced from web with filters and paging (auto-refresh every 15s).</Text>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterScroll}
+        contentContainerStyle={styles.filterRow}
+      >
         {(["open", "joined", "mine"] as EventsFilter[]).map((filterValue) => {
           const active = filterValue === filter;
           return (
@@ -204,8 +209,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: mobileFonts.regular,
   },
+  filterScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   filterRow: {
     flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     paddingVertical: 2,
   },
