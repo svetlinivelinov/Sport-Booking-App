@@ -20,6 +20,9 @@ interface SessionRow {
   startsAt: string;
   venueName: string | null;
   groupId: string;
+  participantCount?: number;
+  isParticipant?: boolean;
+  myParticipantStatus?: string | null;
 }
 
 export function EventsManager() {
@@ -27,6 +30,7 @@ export function EventsManager() {
   const [venueName, setVenueName] = useState("");
   const [startsAtLocal, setStartsAtLocal] = useState(getDefaultStartsAtLocal);
   const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [discoverSessions, setDiscoverSessions] = useState<SessionRow[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editVenueName, setEditVenueName] = useState("");
@@ -34,6 +38,8 @@ export function EventsManager() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [leavingId, setLeavingId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   async function loadSessions() {
@@ -55,8 +61,25 @@ export function EventsManager() {
     }
   }
 
+  async function loadDiscoverSessions() {
+    try {
+      const res = await fetch("/api/sessions?status=open&page=1&pageSize=25", { cache: "no-store" });
+      const data = (await res.json()) as { rows?: SessionRow[]; error?: string };
+
+      if (!res.ok) {
+        setMessage(data.error ?? "Unable to load discover sessions");
+        return;
+      }
+
+      setDiscoverSessions(data.rows ?? []);
+    } catch {
+      setMessage("Unable to load discover sessions");
+    }
+  }
+
   useEffect(() => {
     void loadSessions();
+    void loadDiscoverSessions();
   }, []);
 
   async function onCreate(event: FormEvent<HTMLFormElement>) {
@@ -78,6 +101,7 @@ export function EventsManager() {
       }
 
       setSessions((prev) => [data.session as SessionRow, ...prev]);
+      void loadDiscoverSessions();
       setTitle("");
       setVenueName("");
       setStartsAtLocal(getDefaultStartsAtLocal());
@@ -102,6 +126,7 @@ export function EventsManager() {
       }
 
       setSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
+      setDiscoverSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
       setMessage("Session finalized");
     } catch {
       setMessage("Failed to finalize session");
@@ -145,12 +170,75 @@ export function EventsManager() {
       }
 
       setSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
+      setDiscoverSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
       cancelEditing();
       setMessage("Session updated");
     } catch {
       setMessage("Failed to update session");
     } finally {
       setUpdating(false);
+    }
+  }
+
+  async function joinSession(id: string) {
+    setJoiningId(id);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/sessions/${id}/participants`, { method: "POST" });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setMessage(data.error ?? "Failed to join session");
+        return;
+      }
+
+      setDiscoverSessions((prev) =>
+        prev.map((row) =>
+          row.id === id
+            ? {
+                ...row,
+                isParticipant: true,
+                myParticipantStatus: "joined",
+                participantCount: (row.participantCount ?? 0) + 1,
+              }
+            : row,
+        ),
+      );
+      setMessage("Joined session");
+    } catch {
+      setMessage("Failed to join session");
+    } finally {
+      setJoiningId(null);
+    }
+  }
+
+  async function leaveSession(id: string) {
+    setLeavingId(id);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/sessions/${id}/participants`, { method: "DELETE" });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setMessage(data.error ?? "Failed to leave session");
+        return;
+      }
+
+      setDiscoverSessions((prev) =>
+        prev.map((row) =>
+          row.id === id
+            ? {
+                ...row,
+                isParticipant: false,
+                myParticipantStatus: null,
+                participantCount: Math.max(0, (row.participantCount ?? 0) - 1),
+              }
+            : row,
+        ),
+      );
+      setMessage("Left session");
+    } catch {
+      setMessage("Failed to leave session");
+    } finally {
+      setLeavingId(null);
     }
   }
 
@@ -230,6 +318,41 @@ export function EventsManager() {
     [editStartsAtLocal, editTitle, editVenueName, editingId, sessions, updating],
   );
 
+  const discoverItems = useMemo(
+    () =>
+      discoverSessions.map((row) => (
+        <article key={row.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
+          <p className="font-semibold">{row.title}</p>
+          <p className="text-sm text-[var(--app-muted)]">
+            {new Date(row.startsAt).toLocaleString()} · {row.venueName ?? "TBA"} · {row.status}
+          </p>
+          <p className="mt-1 text-xs text-[var(--app-muted)]">Participants: {row.participantCount ?? 0}</p>
+          <div className="mt-2">
+            {row.isParticipant ? (
+              <button
+                type="button"
+                onClick={() => void leaveSession(row.id)}
+                disabled={leavingId === row.id}
+                className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold disabled:opacity-60"
+              >
+                {leavingId === row.id ? "Leaving..." : "Leave"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void joinSession(row.id)}
+                disabled={joiningId === row.id}
+                className="rounded-xl bg-[var(--app-accent)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {joiningId === row.id ? "Joining..." : "Join"}
+              </button>
+            )}
+          </div>
+        </article>
+      )),
+    [discoverSessions, joiningId, leavingId],
+  );
+
   return (
     <main className="mx-auto grid max-w-5xl gap-6 px-6 py-10 lg:grid-cols-2">
       <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
@@ -274,6 +397,12 @@ export function EventsManager() {
         {loading ? <p className="mt-2 text-sm text-[var(--app-muted)]">Loading sessions...</p> : null}
         {!loading && sessions.length === 0 ? <p className="mt-2 text-sm text-[var(--app-muted)]">No sessions yet.</p> : null}
         <div className="mt-4 space-y-3">{sessionItems}</div>
+      </section>
+
+      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm lg:col-span-2">
+        <h2 className="text-xl font-semibold">Join open sessions</h2>
+        {!discoverSessions.length ? <p className="mt-2 text-sm text-[var(--app-muted)]">No open sessions available.</p> : null}
+        <div className="mt-4 grid gap-3 md:grid-cols-2">{discoverItems}</div>
       </section>
 
       {message ? (

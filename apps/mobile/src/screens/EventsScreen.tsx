@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { appTheme } from "@sport-booking/shared";
-import { getSessions, SessionSummary } from "../lib/authApi";
+import { getSessions, joinSession, leaveSession, SessionSummary } from "../lib/authApi";
 import { mobileFonts } from "../ui/fonts";
 
 interface EventsScreenProps {
@@ -17,6 +17,7 @@ function formatDate(value: string) {
 export function EventsScreen({ token }: EventsScreenProps) {
   const [rows, setRows] = useState<SessionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [busySessionId, setBusySessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadEvents() {
@@ -42,6 +43,60 @@ export function EventsScreen({ token }: EventsScreenProps) {
     void loadEvents();
   }, [token]);
 
+  async function onJoin(row: SessionSummary) {
+    if (!token) {
+      return;
+    }
+    setBusySessionId(row.id);
+    setError(null);
+    try {
+      await joinSession(token, row.id);
+      setRows((prev) =>
+        prev.map((item) =>
+          item.id === row.id
+            ? {
+                ...item,
+                isParticipant: true,
+                myParticipantStatus: "joined",
+                participantCount: (item.participantCount ?? 0) + 1,
+              }
+            : item,
+        ),
+      );
+    } catch (joinError) {
+      setError(joinError instanceof Error ? joinError.message : "Unable to join session.");
+    } finally {
+      setBusySessionId(null);
+    }
+  }
+
+  async function onLeave(row: SessionSummary) {
+    if (!token) {
+      return;
+    }
+    setBusySessionId(row.id);
+    setError(null);
+    try {
+      await leaveSession(token, row.id);
+      setRows((prev) =>
+        prev.map((item) =>
+          item.id === row.id
+            ? {
+                ...item,
+                isParticipant: false,
+                myParticipantStatus: null,
+                participantCount: Math.max(0, (item.participantCount ?? 0) - 1),
+              }
+            : item,
+        ),
+      );
+    } catch (leaveError) {
+      setError(leaveError instanceof Error ? leaveError.message : "Unable to leave session.");
+    } finally {
+      setBusySessionId(null);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Events</Text>
@@ -57,6 +112,26 @@ export function EventsScreen({ token }: EventsScreenProps) {
             <Text style={styles.itemMeta}>Status: {row.status}</Text>
             <Text style={styles.itemMeta}>Starts: {formatDate(row.startsAt)}</Text>
             <Text style={styles.itemMeta}>Venue: {row.venueName || "TBD"}</Text>
+            <Text style={styles.itemMeta}>Participants: {row.participantCount ?? 0}</Text>
+            {row.status === "open" ? (
+              row.isParticipant ? (
+                <TouchableOpacity
+                  style={styles.secondaryActionButton}
+                  onPress={() => void onLeave(row)}
+                  disabled={busySessionId === row.id}
+                >
+                  <Text style={styles.secondaryActionButtonText}>{busySessionId === row.id ? "Leaving..." : "Leave"}</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.primaryActionButton}
+                  onPress={() => void onJoin(row)}
+                  disabled={busySessionId === row.id}
+                >
+                  <Text style={styles.primaryActionButtonText}>{busySessionId === row.id ? "Joining..." : "Join"}</Text>
+                </TouchableOpacity>
+              )
+            ) : null}
           </View>
         ))}
         {!isLoading && !rows.length && !error ? <Text style={styles.empty}>No events found.</Text> : null}
@@ -104,6 +179,34 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: appTheme.colors.muted,
     fontFamily: mobileFonts.regular,
+  },
+  primaryActionButton: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    borderRadius: 10,
+    backgroundColor: appTheme.colors.accent,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  primaryActionButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontFamily: mobileFonts.semiBold,
+  },
+  secondaryActionButton: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#dbe2f0",
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  secondaryActionButtonText: {
+    color: appTheme.colors.foreground,
+    fontSize: 12,
+    fontFamily: mobileFonts.semiBold,
   },
   error: {
     color: "#b42318",

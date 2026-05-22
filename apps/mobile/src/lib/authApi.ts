@@ -14,6 +14,9 @@ export interface SessionSummary {
   startsAt: string;
   venueName: string | null;
   groupId: string;
+  participantCount?: number;
+  isParticipant?: boolean;
+  myParticipantStatus?: string | null;
 }
 
 export interface GroupSummary {
@@ -84,7 +87,7 @@ export async function getMyUser(token: string): Promise<AuthenticatedUser | null
 
 export async function getSessions(
   token: string,
-  params: { mine?: boolean; status?: string; page?: number; pageSize?: number } = {},
+  params: { mine?: boolean; participating?: boolean; status?: string; page?: number; pageSize?: number } = {},
 ): Promise<SessionsResponse> {
   const searchParams = new URLSearchParams();
   if (params.mine) {
@@ -92,6 +95,9 @@ export async function getSessions(
   }
   if (params.status) {
     searchParams.set("status", params.status);
+  }
+  if (params.participating) {
+    searchParams.set("participating", "1");
   }
   if (params.page) {
     searchParams.set("page", String(params.page));
@@ -116,6 +122,34 @@ export async function getSessions(
   }
 
   return payload;
+}
+
+export async function joinSession(token: string, sessionId: string): Promise<void> {
+  const response = await fetch(`${apiBaseUrl}/api/sessions/${sessionId}/participants`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json()) as { error?: string };
+    throw new Error(payload.error || "Unable to join session");
+  }
+}
+
+export async function leaveSession(token: string, sessionId: string): Promise<void> {
+  const response = await fetch(`${apiBaseUrl}/api/sessions/${sessionId}/participants`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json()) as { error?: string };
+    throw new Error(payload.error || "Unable to leave session");
+  }
 }
 
 export async function getGroups(token: string): Promise<GroupsResponse> {
