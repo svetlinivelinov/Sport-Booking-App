@@ -30,8 +30,19 @@ export function EventsScreen({ token }: EventsScreenProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getSessions(token, { pageSize: 20 });
-      setRows(response.rows);
+      const firstPage = await getSessions(token, { status: "open", page: 1, pageSize: 50 });
+      let allRows = firstPage.rows;
+
+      if (firstPage.totalPages > 1) {
+        const pages = await Promise.all(
+          Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+            getSessions(token, { status: "open", page: index + 2, pageSize: 50 }),
+          ),
+        );
+        allRows = allRows.concat(...pages.map((page) => page.rows));
+      }
+
+      setRows(allRows);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Unable to load events.");
     } finally {
@@ -41,6 +52,18 @@ export function EventsScreen({ token }: EventsScreenProps) {
 
   useEffect(() => {
     void loadEvents();
+
+    if (!token) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      void loadEvents();
+    }, 15000);
+
+    return () => {
+      clearInterval(timer);
+    };
   }, [token]);
 
   async function onJoin(row: SessionSummary) {
@@ -100,7 +123,7 @@ export function EventsScreen({ token }: EventsScreenProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Events</Text>
-      <Text style={styles.subtitle}>Live sessions from the web backend.</Text>
+      <Text style={styles.subtitle}>Open sessions synced from web (auto-refresh every 15s).</Text>
 
       {isLoading ? <ActivityIndicator color={appTheme.colors.primary} /> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
