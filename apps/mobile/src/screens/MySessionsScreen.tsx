@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { appTheme } from "@sport-booking/shared";
@@ -7,6 +7,8 @@ import { mobileFonts } from "../ui/fonts";
 
 interface MySessionsScreenProps {
   token: string | null;
+  refreshKey: number;
+  onSessionChange?: () => void;
 }
 
 function formatDate(value: string) {
@@ -14,15 +16,20 @@ function formatDate(value: string) {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 }
 
-export function MySessionsScreen({ token }: MySessionsScreenProps) {
+export function MySessionsScreen({ token, refreshKey, onSessionChange }: MySessionsScreenProps) {
   const [rows, setRows] = useState<SessionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [busySessionId, setBusySessionId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const pageSize = 10;
 
-  async function loadMine() {
+  const loadMine = useCallback(async () => {
     if (!token) {
       setRows([]);
+      setPage(1);
+      setTotalPages(1);
       setError("Sign in to load your sessions.");
       return;
     }
@@ -30,18 +37,25 @@ export function MySessionsScreen({ token }: MySessionsScreenProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getSessions(token, { participating: true, pageSize: 20 });
+      const response = await getSessions(token, { participating: true, page, pageSize });
+
+      if (page > 1 && response.rows.length === 0) {
+        setPage((prev) => Math.max(1, prev - 1));
+        return;
+      }
+
       setRows(response.rows);
+      setTotalPages(Math.max(1, response.totalPages || 1));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Unable to load your sessions.");
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [page, token]);
 
   useEffect(() => {
     void loadMine();
-  }, [token]);
+  }, [loadMine, token, refreshKey]);
 
   async function onLeave(row: SessionSummary) {
     if (!token) {
@@ -52,7 +66,8 @@ export function MySessionsScreen({ token }: MySessionsScreenProps) {
     setError(null);
     try {
       await leaveSession(token, row.id);
-      setRows((prev) => prev.filter((item) => item.id !== row.id));
+      onSessionChange?.();
+      await loadMine();
     } catch (leaveError) {
       setError(leaveError instanceof Error ? leaveError.message : "Unable to leave this session.");
     } finally {
@@ -88,6 +103,26 @@ export function MySessionsScreen({ token }: MySessionsScreenProps) {
         ))}
         {!isLoading && !rows.length && !error ? <Text style={styles.empty}>No sessions yet.</Text> : null}
       </ScrollView>
+
+      <View style={styles.pagingRow}>
+        <TouchableOpacity
+          style={[styles.pageButton, page <= 1 && styles.pageButtonDisabled]}
+          onPress={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page <= 1 || isLoading}
+        >
+          <Text style={styles.pageButtonText}>Prev</Text>
+        </TouchableOpacity>
+        <Text style={styles.pageLabel}>
+          Page {page} / {Math.max(1, totalPages)}
+        </Text>
+        <TouchableOpacity
+          style={[styles.pageButton, page >= totalPages && styles.pageButtonDisabled]}
+          onPress={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page >= totalPages || isLoading}
+        >
+          <Text style={styles.pageButtonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={loadMine} disabled={isLoading}>
         <Text style={styles.buttonText}>{isLoading ? "Refreshing..." : "Refresh my sessions"}</Text>
@@ -155,6 +190,35 @@ const styles = StyleSheet.create({
   empty: {
     color: appTheme.colors.muted,
     fontSize: 13,
+    fontFamily: mobileFonts.regular,
+  },
+  pagingRow: {
+    marginTop: -2,
+    marginBottom: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  pageButton: {
+    borderWidth: 1,
+    borderColor: "#dbe2f0",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  pageButtonDisabled: {
+    opacity: 0.45,
+  },
+  pageButtonText: {
+    color: appTheme.colors.foreground,
+    fontSize: 12,
+    fontFamily: mobileFonts.semiBold,
+  },
+  pageLabel: {
+    color: appTheme.colors.muted,
+    fontSize: 12,
     fontFamily: mobileFonts.regular,
   },
   button: {

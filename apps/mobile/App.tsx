@@ -31,6 +31,11 @@ export default function App() {
   });
   const [screen, setScreen] = useState<ScreenKey>('login');
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [sessionRefreshKey, setSessionRefreshKey] = useState(0);
+
+  function onSessionChange() {
+    setSessionRefreshKey((prev) => prev + 1);
+  }
 
   const content = useMemo(() => {
     if (screen === 'login') {
@@ -47,13 +52,13 @@ export default function App() {
       return <DashboardScreen token={authToken} />;
     }
     if (screen === 'events') {
-      return <EventsScreen token={authToken} />;
+      return <EventsScreen token={authToken} refreshKey={sessionRefreshKey} onSessionChange={onSessionChange} />;
     }
     if (screen === 'groups') {
       return <GroupsScreen token={authToken} />;
     }
     if (screen === 'my-sessions') {
-      return <MySessionsScreen token={authToken} />;
+      return <MySessionsScreen token={authToken} refreshKey={sessionRefreshKey} onSessionChange={onSessionChange} />;
     }
     return <ProfileScreen token={authToken} />;
   }, [authToken, screen]);

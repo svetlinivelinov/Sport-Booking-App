@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { appTheme } from "@sport-booking/shared";
 import { getSessions, joinSession, leaveSession, SessionSummary } from "../lib/authApi";
@@ -7,22 +7,32 @@ import { mobileFonts } from "../ui/fonts";
 
 interface EventsScreenProps {
   token: string | null;
+  refreshKey: number;
+  onSessionChange?: () => void;
 }
+
+type EventsFilter = "open" | "joined" | "mine";
 
 function formatDate(value: string) {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 }
 
-export function EventsScreen({ token }: EventsScreenProps) {
+export function EventsScreen({ token, refreshKey, onSessionChange }: EventsScreenProps) {
   const [rows, setRows] = useState<SessionSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [busySessionId, setBusySessionId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<EventsFilter>("open");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const pageSize = 10;
 
-  async function loadEvents() {
+  const loadEvents = useCallback(async () => {
     if (!token) {
       setRows([]);
+      setPage(1);
+      setTotalPages(1);
       setError("Sign in to load events.");
       return;
     }
@@ -30,25 +40,25 @@ export function EventsScreen({ token }: EventsScreenProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const firstPage = await getSessions(token, { status: "open", page: 1, pageSize: 50 });
-      let allRows = firstPage.rows;
-
-      if (firstPage.totalPages > 1) {
-        const pages = await Promise.all(
-          Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
-            getSessions(token, { status: "open", page: index + 2, pageSize: 50 }),
-          ),
-        );
-        allRows = allRows.concat(...pages.map((page) => page.rows));
-      }
-
-      setRows(allRows);
+      const response = await getSessions(token, {
+        status: filter === "open" ? "open" : undefined,
+        participating: filter === "joined",
+        mine: filter === "mine",
+        page,
+        pageSize,
+      });
+      setRows(response.rows);
+      setTotalPages(Math.max(1, response.totalPages || 1));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Unable to load events.");
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [filter, page, token]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter]);
 
   useEffect(() => {
     void loadEvents();
@@ -64,7 +74,7 @@ export function EventsScreen({ token }: EventsScreenProps) {
     return () => {
       clearInterval(timer);
     };
-  }, [token]);
+  }, [loadEvents, token, refreshKey]);
 
   async function onJoin(row: SessionSummary) {
     if (!token) {
@@ -74,18 +84,8 @@ export function EventsScreen({ token }: EventsScreenProps) {
     setError(null);
     try {
       await joinSession(token, row.id);
-      setRows((prev) =>
-        prev.map((item) =>
-          item.id === row.id
-            ? {
-                ...item,
-                isParticipant: true,
-                myParticipantStatus: "joined",
-                participantCount: (item.participantCount ?? 0) + 1,
-              }
-            : item,
-        ),
-      );
+      onSessionChange?.();
+      await loadEvents();
     } catch (joinError) {
       setError(joinError instanceof Error ? joinError.message : "Unable to join session.");
     } finally {
@@ -101,18 +101,8 @@ export function EventsScreen({ token }: EventsScreenProps) {
     setError(null);
     try {
       await leaveSession(token, row.id);
-      setRows((prev) =>
-        prev.map((item) =>
-          item.id === row.id
-            ? {
-                ...item,
-                isParticipant: false,
-                myParticipantStatus: null,
-                participantCount: Math.max(0, (item.participantCount ?? 0) - 1),
-              }
-            : item,
-        ),
-      );
+      onSessionChange?.();
+      await loadEvents();
     } catch (leaveError) {
       setError(leaveError instanceof Error ? leaveError.message : "Unable to leave session.");
     } finally {
@@ -123,7 +113,22 @@ export function EventsScreen({ token }: EventsScreenProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Events</Text>
-      <Text style={styles.subtitle}>Open sessions synced from web (auto-refresh every 15s).</Text>
+      <Text style={styles.subtitle}>Synced from web with filters and paging (auto-refresh every 15s).</Text>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
+        {(["open", "joined", "mine"] as EventsFilter[]).map((filterValue) => {
+          const active = filterValue === filter;
+          return (
+            <Pressable
+              key={filterValue}
+              onPress={() => setFilter(filterValue)}
+              style={[styles.filterChip, active && styles.filterChipActive]}
+            >
+              <Text style={[styles.filterText, active && styles.filterTextActive]}>{filterValue}</Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
       {isLoading ? <ActivityIndicator color={appTheme.colors.primary} /> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -160,6 +165,26 @@ export function EventsScreen({ token }: EventsScreenProps) {
         {!isLoading && !rows.length && !error ? <Text style={styles.empty}>No events found.</Text> : null}
       </ScrollView>
 
+      <View style={styles.pagingRow}>
+        <TouchableOpacity
+          style={[styles.pageButton, page <= 1 && styles.pageButtonDisabled]}
+          onPress={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page <= 1 || isLoading}
+        >
+          <Text style={styles.pageButtonText}>Prev</Text>
+        </TouchableOpacity>
+        <Text style={styles.pageLabel}>
+          Page {page} / {Math.max(1, totalPages)}
+        </Text>
+        <TouchableOpacity
+          style={[styles.pageButton, page >= totalPages && styles.pageButtonDisabled]}
+          onPress={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page >= totalPages || isLoading}
+        >
+          <Text style={styles.pageButtonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={loadEvents} disabled={isLoading}>
         <Text style={styles.buttonText}>{isLoading ? "Refreshing..." : "Refresh events"}</Text>
       </TouchableOpacity>
@@ -178,6 +203,32 @@ const styles = StyleSheet.create({
     color: appTheme.colors.muted,
     fontSize: 14,
     fontFamily: mobileFonts.regular,
+  },
+  filterRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingVertical: 2,
+  },
+  filterChip: {
+    borderWidth: 1,
+    borderColor: "#dbe2f0",
+    borderRadius: 999,
+    backgroundColor: "#eef2fa",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  filterChipActive: {
+    borderColor: appTheme.colors.primary,
+    backgroundColor: appTheme.colors.primary,
+  },
+  filterText: {
+    color: appTheme.colors.foreground,
+    fontSize: 12,
+    textTransform: "capitalize",
+    fontFamily: mobileFonts.semiBold,
+  },
+  filterTextActive: {
+    color: "#ffffff",
   },
   list: {
     flex: 1,
@@ -239,6 +290,35 @@ const styles = StyleSheet.create({
   empty: {
     color: appTheme.colors.muted,
     fontSize: 13,
+    fontFamily: mobileFonts.regular,
+  },
+  pagingRow: {
+    marginTop: -2,
+    marginBottom: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  pageButton: {
+    borderWidth: 1,
+    borderColor: "#dbe2f0",
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  pageButtonDisabled: {
+    opacity: 0.45,
+  },
+  pageButtonText: {
+    color: appTheme.colors.foreground,
+    fontSize: 12,
+    fontFamily: mobileFonts.semiBold,
+  },
+  pageLabel: {
+    color: appTheme.colors.muted,
+    fontSize: 12,
     fontFamily: mobileFonts.regular,
   },
   button: {
