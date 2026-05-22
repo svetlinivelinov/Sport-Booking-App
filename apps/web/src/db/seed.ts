@@ -62,10 +62,7 @@ function pickMode(input?: string): SeedMode {
   return input === "large" ? "large" : "small";
 }
 
-async function insertInChunks<T extends Record<string, unknown>>(
-  table: { [k: string]: unknown },
-  rows: T[],
-) {
+async function insertInChunks<T>(table: unknown, rows: T[]) {
   for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
     const chunk = rows.slice(i, i + CHUNK_SIZE);
     await db.insert(table as never).values(chunk as never);
@@ -189,7 +186,7 @@ async function seed(mode: SeedMode) {
           sessionId: session.id,
           roundNumber: round,
           slotNumber: slot,
-          status: session.status === "finished" ? "verified" : "pending",
+          status: session.status === "finished" ? "finished" : "pending",
           sideAUserIds: [a1, a2],
           sideBUserIds: [b1, b2],
           createdAt: now,
@@ -201,7 +198,7 @@ async function seed(mode: SeedMode) {
 
   const scoreRows: Array<(typeof scoreEntries.$inferInsert)> = [];
   for (const matchup of matchupRows) {
-    if (matchup.status !== "verified") {
+    if (matchup.status !== "finished") {
       continue;
     }
     scoreRows.push({
@@ -209,8 +206,8 @@ async function seed(mode: SeedMode) {
       matchupId: matchup.id,
       submittedByUserId: userRows[randomInt(userRows.length)].id,
       scorePayload: {
-        sideA: randomInt(8),
-        sideB: randomInt(8),
+        sideAScore: randomInt(8),
+        sideBScore: randomInt(8),
       },
       createdAt: now,
     });
