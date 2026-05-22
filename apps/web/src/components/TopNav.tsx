@@ -6,6 +6,7 @@ import { useState } from "react";
 
 const appLinks = [
   { href: "/dashboard", label: "Upcoming" },
+  { href: "/groups", label: "Groups" },
   { href: "/events", label: "Events" },
   { href: "/profile", label: "Profile" },
 ];

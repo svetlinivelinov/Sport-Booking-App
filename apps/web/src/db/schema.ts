@@ -62,6 +62,25 @@ export const groups = pgTable(
   (table) => [index("groups_sport_idx").on(table.sportId)],
 );
 
+export const groupMembers = pgTable(
+  "group_members",
+  {
+    groupId: varchar("group_id", { length: 36 })
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: varchar("user_id", { length: 36 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: varchar("role", { length: 16 }).notNull().default("member"),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.groupId, table.userId], name: "group_members_pk" }),
+    index("group_members_user_idx").on(table.userId),
+    check("group_members_role_check", sql`${table.role} in ('member', 'manager')`),
+  ],
+);
+
 export const sessions = pgTable(
   "sessions",
   {

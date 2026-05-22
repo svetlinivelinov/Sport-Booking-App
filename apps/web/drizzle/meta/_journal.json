@@ -15,6 +15,13 @@
       "when": 1779434818760,
       "tag": "0001_outstanding_expediter",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779442200000,
+      "tag": "0002_group_membership",
+      "breakpoints": true
     }
   ]
 }

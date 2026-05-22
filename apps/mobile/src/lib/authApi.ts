@@ -16,6 +16,18 @@ export interface SessionSummary {
   groupId: string;
 }
 
+export interface GroupSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  sportId: string;
+  sportName: string;
+  isOwner: boolean;
+  isMember: boolean;
+  memberRole: string | null;
+  memberCount: number;
+}
+
 interface LoginResponse {
   token: string;
   user: AuthenticatedUser;
@@ -28,6 +40,11 @@ interface SessionsResponse {
   total: number;
   totalPages: number;
   rows: SessionSummary[];
+  error?: string;
+}
+
+interface GroupsResponse {
+  rows: GroupSummary[];
   error?: string;
 }
 
@@ -99,4 +116,48 @@ export async function getSessions(
   }
 
   return payload;
+}
+
+export async function getGroups(token: string): Promise<GroupsResponse> {
+  const response = await fetch(`${apiBaseUrl}/api/groups`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const payload = (await response.json()) as GroupsResponse;
+  if (!response.ok) {
+    throw new Error(payload.error || "Unable to load groups");
+  }
+
+  return payload;
+}
+
+export async function joinGroup(token: string, groupId: string): Promise<void> {
+  const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}/membership`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json()) as { error?: string };
+    throw new Error(payload.error || "Unable to join group");
+  }
+}
+
+export async function leaveGroup(token: string, groupId: string): Promise<void> {
+  const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}/membership`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json()) as { error?: string };
+    throw new Error(payload.error || "Unable to leave group");
+  }
 }

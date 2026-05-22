@@ -6,16 +6,18 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { appTheme } from '@sport-booking/shared';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
+import { GroupsScreen } from './src/screens/GroupsScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { MySessionsScreen } from './src/screens/MySessionsScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { mobileFonts } from './src/ui/fonts';
 
-type ScreenKey = 'login' | 'dashboard' | 'events' | 'my-sessions' | 'profile';
+type ScreenKey = 'login' | 'dashboard' | 'groups' | 'events' | 'my-sessions' | 'profile';
 
 const tabs: Array<{ key: ScreenKey; label: string }> = [
   { key: 'login', label: 'Login' },
   { key: 'dashboard', label: 'Dashboard' },
+  { key: 'groups', label: 'Groups' },
   { key: 'events', label: 'Events' },
   { key: 'my-sessions', label: 'My Sessions' },
   { key: 'profile', label: 'Profile' },
@@ -46,6 +48,9 @@ export default function App() {
     }
     if (screen === 'events') {
       return <EventsScreen token={authToken} />;
+    }
+    if (screen === 'groups') {
+      return <GroupsScreen token={authToken} />;
     }
     if (screen === 'my-sessions') {
       return <MySessionsScreen token={authToken} />;
