@@ -21,6 +21,10 @@ Create `apps/mobile/.env` from `apps/mobile/.env.example` before building export
 
 0. Validate env configuration:
    - `npm run check:web-env`
+0. Start both apps with clean ports:
+   - `npm run dev:fresh`
+   - Web default URL: `http://localhost:3010`
+   - Mobile web default URL: `http://localhost:8090`
 1. Run migrations:
    - `npm run db:migrate`
 2. Seed a small dataset:
@@ -33,6 +37,7 @@ Create `apps/mobile/.env` from `apps/mobile/.env.example` before building export
    - `GET /api/health`
 6. Run smoke checks against running web + mobile web servers:
    - `npm run test:smoke`
+   - Optional custom URLs: `npm run test:smoke -- -WebUrl http://localhost:3000 -MobileUrl http://localhost:8081`
 
 ## Paging Acceptance
 
