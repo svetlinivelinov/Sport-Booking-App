@@ -1,4 +1,5 @@
 import {
+  check,
   index,
   integer,
   jsonb,
@@ -9,6 +10,7 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable(
   "users",
@@ -20,7 +22,11 @@ export const users = pgTable(
     role: varchar("role", { length: 16 }).notNull().default("user"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex("users_email_uq").on(table.email)],
+  (table) => [
+    uniqueIndex("users_email_uq").on(table.email),
+    index("users_role_idx").on(table.role),
+    check("users_role_check", sql`${table.role} in ('user', 'admin')`),
+  ],
 );
 
 export const sports = pgTable(

@@ -36,3 +36,79 @@ These are represented by `SportRules` in `packages/shared/src/domain/rules.ts`.
 ## Next Step
 
 Implement Drizzle schema and migrations to persist these entities in PostgreSQL.
+
+## Current DB Baseline (Implemented)
+
+Current Drizzle schema in [apps/web/src/db/schema.ts](apps/web/src/db/schema.ts) already includes:
+
+- users
+- sports
+- groups
+- sessions
+- session_participants
+- matchups
+- score_entries
+
+This covers the capstone minimum table count and core relationships.
+
+## Support Folder Database Reuse Analysis
+
+Reference inputs reviewed:
+
+- [Support Folder/database/004_game_lifecycle.sql](Support%20Folder/database/004_game_lifecycle.sql)
+- [Support Folder/database/database_additions.js](Support%20Folder/database/database_additions.js)
+
+What to reuse as concepts:
+
+- Session lifecycle states: pending, active, finished.
+- Close/finalize flag after completion.
+- Round progression tracking (current round, total rounds).
+- Per-session scoring configuration (points per match).
+- Fast access indexes for event/session round queries.
+
+What to re-implement (not copy directly):
+
+- Supabase-specific RLS and auth.users dependencies.
+- Legacy events/rounds/matches naming and direct SQL policy logic.
+- Hardcoded team slots columns (team_a_p1, team_a_p2, team_b_p1, team_b_p2).
+
+## Proposed v1 DB Design Refinement
+
+To align current schema with reusable lifecycle concepts while staying sport-agnostic:
+
+1. Extend sessions with lifecycle fields:
+	- lifecycle_status (pending, active, finished)
+	- is_closed (boolean)
+	- points_per_match (integer)
+	- total_rounds (integer)
+	- current_round (integer)
+
+2. Add session_rounds table (normalized round tracking):
+	- id
+	- session_id (fk)
+	- round_number
+	- status (active, completed)
+	- created_at
+	- unique(session_id, round_number)
+
+3. Keep matchups as the generic match table:
+	- continue using side_a_user_ids and side_b_user_ids (JSON arrays) for sport-agnostic team size support.
+	- optionally add round_id fk to session_rounds for stronger referential integrity.
+
+4. Index strategy refinement:
+	- sessions(group_id, lifecycle_status, starts_at)
+	- session_rounds(session_id, round_number)
+	- matchups(session_id, round_number, slot_number)
+	- score_entries(matchup_id)
+
+## Service-Level Behavior to Reuse from Legacy Logic
+
+From the legacy helper functions, re-implement these workflows in typed services:
+
+- start session game (set active status and initialize round counters)
+- finalize session game (set finished and closed)
+- generate next round (complete previous round, create new one, create matchups)
+- submit matchup score (mark matchup completed, persist score entry)
+- build leaderboard projection from completed matchups
+
+These should live in service modules and be exposed through REST endpoints, not embedded in route handlers.
