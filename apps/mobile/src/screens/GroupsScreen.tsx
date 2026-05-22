@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { appTheme } from "@sport-booking/shared";
 
-import { GroupSummary, getGroups, joinGroup, leaveGroup } from "../lib/authApi";
+import { deleteGroup, GroupSummary, getGroups, joinGroup, leaveGroup, updateGroup } from "../lib/authApi";
 import { mobileFonts } from "../ui/fonts";
 
 interface GroupsScreenProps {
@@ -12,7 +12,12 @@ interface GroupsScreenProps {
 
 export function GroupsScreen({ token }: GroupsScreenProps) {
   const [rows, setRows] = useState<GroupSummary[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadGroups() {
@@ -76,6 +81,65 @@ export function GroupsScreen({ token }: GroupsScreenProps) {
     }
   }
 
+  function startEdit(row: GroupSummary) {
+    setEditingId(row.id);
+    setEditName(row.name);
+    setEditDescription(row.description ?? "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditName("");
+    setEditDescription("");
+  }
+
+  async function onSaveOwnerGroup(groupId: string) {
+    if (!token) {
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const updated = await updateGroup(token, groupId, { name: editName, description: editDescription });
+      setRows((prev) =>
+        prev.map((row) =>
+          row.id === groupId
+            ? {
+                ...row,
+                name: updated.name,
+                description: updated.description,
+                sportName: updated.sportName,
+              }
+            : row,
+        ),
+      );
+      cancelEdit();
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : "Unable to update group.");
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  async function onDeleteOwnerGroup(groupId: string) {
+    if (!token) {
+      return;
+    }
+
+    setDeletingId(groupId);
+    try {
+      await deleteGroup(token, groupId);
+      setRows((prev) => prev.filter((row) => row.id !== groupId));
+      if (editingId === groupId) {
+        cancelEdit();
+      }
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Unable to delete group.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const myGroups = rows.filter((row) => row.isMember);
   const discoverGroups = rows.filter((row) => !row.isMember);
 
@@ -91,15 +155,50 @@ export function GroupsScreen({ token }: GroupsScreenProps) {
         <Text style={styles.sectionTitle}>My groups</Text>
         {myGroups.map((row) => (
           <View key={row.id} style={styles.item}>
-            <Text style={styles.itemTitle}>{row.name}</Text>
-            <Text style={styles.itemMeta}>{row.sportName} · {row.memberCount} members</Text>
-            {row.description ? <Text style={styles.itemMeta}>{row.description}</Text> : null}
-            {row.isOwner ? (
-              <Text style={styles.ownerBadge}>Owner</Text>
+            {editingId === row.id ? (
+              <>
+                <TextInput style={styles.input} value={editName} onChangeText={setEditName} placeholder="Group name" />
+                <TextInput
+                  style={[styles.input, styles.multilineInput]}
+                  value={editDescription}
+                  onChangeText={setEditDescription}
+                  placeholder="Description"
+                  multiline
+                />
+                <View style={styles.inlineButtons}>
+                  <TouchableOpacity style={styles.joinButton} onPress={() => void onSaveOwnerGroup(row.id)} disabled={isUpdating}>
+                    <Text style={styles.joinButtonText}>{isUpdating ? "Saving..." : "Save"}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.leaveButton} onPress={cancelEdit} disabled={isUpdating}>
+                    <Text style={styles.leaveButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
             ) : (
-              <TouchableOpacity style={styles.leaveButton} onPress={() => void onLeave(row.id)}>
-                <Text style={styles.leaveButtonText}>Leave</Text>
-              </TouchableOpacity>
+              <>
+                <Text style={styles.itemTitle}>{row.name}</Text>
+                <Text style={styles.itemMeta}>{row.sportName} · {row.memberCount} members</Text>
+                {row.description ? <Text style={styles.itemMeta}>{row.description}</Text> : null}
+                {row.isOwner ? (
+                  <View style={styles.inlineButtons}>
+                    <Text style={styles.ownerBadge}>Owner</Text>
+                    <TouchableOpacity style={styles.leaveButton} onPress={() => startEdit(row)}>
+                      <Text style={styles.leaveButtonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => void onDeleteOwnerGroup(row.id)}
+                      disabled={deletingId === row.id}
+                    >
+                      <Text style={styles.deleteButtonText}>{deletingId === row.id ? "Deleting..." : "Delete"}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity style={styles.leaveButton} onPress={() => void onLeave(row.id)}>
+                    <Text style={styles.leaveButtonText}>Leave</Text>
+                  </TouchableOpacity>
+                )}
+              </>
             )}
           </View>
         ))}
@@ -211,6 +310,39 @@ const styles = StyleSheet.create({
     color: appTheme.colors.foreground,
     fontSize: 12,
     fontFamily: mobileFonts.semiBold,
+  },
+  deleteButton: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    borderRadius: 10,
+    backgroundColor: appTheme.colors.danger,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  deleteButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontFamily: mobileFonts.semiBold,
+  },
+  inlineButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    alignItems: "center",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#dbe2f0",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    color: appTheme.colors.foreground,
+    backgroundColor: appTheme.colors.surface,
+    fontFamily: mobileFonts.regular,
+  },
+  multilineInput: {
+    minHeight: 70,
+    textAlignVertical: "top",
   },
   refreshButton: {
     marginTop: 6,

@@ -161,3 +161,39 @@ export async function leaveGroup(token: string, groupId: string): Promise<void> 
     throw new Error(payload.error || "Unable to leave group");
   }
 }
+
+export async function updateGroup(
+  token: string,
+  groupId: string,
+  input: { name: string; description?: string },
+): Promise<GroupSummary> {
+  const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  const payload = (await response.json()) as { group?: GroupSummary; error?: string };
+  if (!response.ok || !payload.group) {
+    throw new Error(payload.error || "Unable to update group");
+  }
+
+  return payload.group;
+}
+
+export async function deleteGroup(token: string, groupId: string): Promise<void> {
+  const response = await fetch(`${apiBaseUrl}/api/groups/${groupId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json()) as { error?: string };
+    throw new Error(payload.error || "Unable to delete group");
+  }
+}

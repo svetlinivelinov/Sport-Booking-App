@@ -18,8 +18,13 @@ export function GroupsManager() {
   const [rows, setRows] = useState<GroupRow[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   async function loadGroups() {
@@ -120,6 +125,81 @@ export function GroupsManager() {
     );
   }
 
+  function startEdit(row: GroupRow) {
+    setEditingId(row.id);
+    setEditName(row.name);
+    setEditDescription(row.description ?? "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditName("");
+    setEditDescription("");
+  }
+
+  async function saveEdit(groupId: string) {
+    setUpdating(true);
+    setMessage(null);
+    try {
+      const response = await fetch(`/api/groups/${groupId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName, description: editDescription }),
+      });
+
+      const payload = (await response.json()) as { group?: GroupRow; error?: string };
+      if (!response.ok || !payload.group) {
+        setMessage(payload.error ?? "Unable to update group");
+        return;
+      }
+
+      setRows((prev) =>
+        prev.map((row) =>
+          row.id === groupId
+            ? {
+                ...row,
+                name: payload.group!.name,
+                description: payload.group!.description,
+                sportName: payload.group!.sportName,
+              }
+            : row,
+        ),
+      );
+
+      cancelEdit();
+      setMessage("Group updated");
+    } catch {
+      setMessage("Unable to update group");
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function deleteOwnedGroup(groupId: string) {
+    const confirmed = typeof globalThis.confirm === "function" ? globalThis.confirm("Delete this group?") : true;
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(groupId);
+    setMessage(null);
+    try {
+      const response = await fetch(`/api/groups/${groupId}`, { method: "DELETE" });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setMessage(payload.error ?? "Unable to delete group");
+        return;
+      }
+
+      setRows((prev) => prev.filter((row) => row.id !== groupId));
+      setMessage("Group deleted");
+    } catch {
+      setMessage("Unable to delete group");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const myGroups = useMemo(() => rows.filter((row) => row.isMember), [rows]);
   const discoverGroups = useMemo(() => rows.filter((row) => !row.isMember), [rows]);
 
@@ -162,26 +242,77 @@ export function GroupsManager() {
         <div className="mt-4 space-y-3">
           {myGroups.map((row) => (
             <article key={row.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-semibold">{row.name}</p>
-                  <p className="text-sm text-[var(--app-muted)]">
-                    {row.sportName} · {row.memberCount} members · {row.memberRole ?? "member"}
-                  </p>
-                  {row.description ? <p className="mt-1 text-sm text-[var(--app-muted)]">{row.description}</p> : null}
+              {editingId === row.id ? (
+                <div className="space-y-2">
+                  <input
+                    className="w-full rounded-xl border border-black/10 px-3 py-2"
+                    value={editName}
+                    onChange={(event) => setEditName(event.target.value)}
+                    required
+                  />
+                  <textarea
+                    className="w-full rounded-xl border border-black/10 px-3 py-2"
+                    rows={3}
+                    value={editDescription}
+                    onChange={(event) => setEditDescription(event.target.value)}
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void saveEdit(row.id)}
+                      disabled={updating}
+                      className="rounded-xl bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                    >
+                      {updating ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                {!row.isOwner ? (
-                  <button
-                    type="button"
-                    onClick={() => void leaveGroup(row.id)}
-                    className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
-                  >
-                    Leave
-                  </button>
-                ) : (
-                  <span className="rounded-xl bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white">Owner</span>
-                )}
-              </div>
+              ) : (
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-semibold">{row.name}</p>
+                    <p className="text-sm text-[var(--app-muted)]">
+                      {row.sportName} · {row.memberCount} members · {row.memberRole ?? "member"}
+                    </p>
+                    {row.description ? <p className="mt-1 text-sm text-[var(--app-muted)]">{row.description}</p> : null}
+                  </div>
+                  {!row.isOwner ? (
+                    <button
+                      type="button"
+                      onClick={() => void leaveGroup(row.id)}
+                      className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                    >
+                      Leave
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-xl bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white">Owner</span>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(row)}
+                        className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void deleteOwnedGroup(row.id)}
+                        disabled={deletingId === row.id}
+                        className="rounded-xl bg-[var(--app-danger)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                      >
+                        {deletingId === row.id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </article>
           ))}
         </div>
