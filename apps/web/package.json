@@ -14,27 +14,27 @@
     "db:seed:large": "tsx src/db/seed.ts large"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4",
     "@sport-booking/shared": "file:../../packages/shared",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "jsonwebtoken": "^9.0.3",
     "next": "16.2.6",
     "pg": "^8.21.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwindcss": "^4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
-    "tailwindcss": "^4",
     "tsx": "^4.20.5",
     "typescript": "^5"
   }
