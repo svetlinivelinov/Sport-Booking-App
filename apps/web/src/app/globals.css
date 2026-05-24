@@ -140,8 +140,10 @@ pre {
 }
 
 .ui-nav-pill-muted {
-  color: var(--app-muted);
-  font-weight: 500;
+  color: var(--app-fg);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border-soft);
+  font-weight: 600;
 }
 
 .ui-nav-pill-muted:hover {

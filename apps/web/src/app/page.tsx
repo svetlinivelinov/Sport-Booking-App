@@ -18,7 +18,10 @@ export default function Home() {
           <Link href="/signup" className="rounded-full bg-[var(--app-primary)] px-5 py-2.5 font-semibold text-white">
             Create account
           </Link>
-          <Link href="/login" className="rounded-full border border-black/10 bg-white px-5 py-2.5 font-semibold">
+          <Link
+            href="/login"
+            className="rounded-full border border-[var(--app-border-soft)] bg-[var(--app-surface)] px-5 py-2.5 font-semibold text-[var(--app-fg)]"
+          >
             Login
           </Link>
         </div>
