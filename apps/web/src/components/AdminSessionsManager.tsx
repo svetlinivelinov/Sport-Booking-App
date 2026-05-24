@@ -12,10 +12,21 @@ interface SessionRow {
 }
 
 type SessionStatus = "draft" | "open" | "finished";
+type StatusFilter = "all" | SessionStatus;
 
 interface SessionsResponse {
   rows?: SessionRow[];
   error?: string;
+}
+
+function statusBadgeClass(status: string) {
+  if (status === "open") {
+    return "border-[var(--app-status-open-border)] bg-[var(--app-status-open-bg)] text-[var(--app-status-open-text)]";
+  }
+  if (status === "finished") {
+    return "border-[var(--app-status-finished-border)] bg-[var(--app-status-finished-bg)] ui-text-muted";
+  }
+  return "border-[var(--app-status-draft-border)] bg-[var(--app-status-draft-bg)] text-[var(--app-primary)]";
 }
 
 function toDatetimeLocal(value: string) {
@@ -30,6 +41,7 @@ function toDatetimeLocal(value: string) {
 
 export function AdminSessionsManager() {
   const [rows, setRows] = useState<SessionRow[]>([]);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [venueName, setVenueName] = useState("");
@@ -43,7 +55,12 @@ export function AdminSessionsManager() {
     setMessage(null);
 
     try {
-      const response = await fetch("/api/sessions?page=1&pageSize=20", { cache: "no-store" });
+      const query = new URLSearchParams({ page: "1", pageSize: "20" });
+      if (statusFilter !== "all") {
+        query.set("status", statusFilter);
+      }
+
+      const response = await fetch(`/api/sessions?${query.toString()}`, { cache: "no-store" });
       const payload = (await response.json()) as SessionsResponse;
 
       if (!response.ok) {
@@ -59,7 +76,7 @@ export function AdminSessionsManager() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => {
     void loadSessions();
@@ -177,6 +194,26 @@ export function AdminSessionsManager() {
         </button>
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {(["all", "open", "draft", "finished"] as StatusFilter[]).map((filter) => {
+          const active = filter === statusFilter;
+          return (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setStatusFilter(filter)}
+              className={`ui-button border capitalize ${
+                active
+                  ? "border-[var(--app-primary)] bg-[var(--app-primary)] text-[var(--app-on-primary)]"
+                  : "border-[var(--app-border-soft)] bg-[var(--app-surface)]"
+              }`}
+            >
+              {filter}
+            </button>
+          );
+        })}
+      </div>
+
       {message ? <p className="mb-4 ui-text-sm ui-text-muted">{message}</p> : null}
 
       <div className="space-y-3">
@@ -209,8 +246,14 @@ export function AdminSessionsManager() {
             ) : (
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold">{row.title}</p>
-                  <p className="ui-text-sm ui-text-muted">Status: {row.status}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold">{row.title}</p>
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClass(row.status)}`}
+                    >
+                      {row.status}
+                    </span>
+                  </div>
                   <p className="ui-text-sm ui-text-muted">Starts: {new Date(row.startsAt).toLocaleString()}</p>
                   <p className="ui-text-sm ui-text-muted">Venue: {row.venueName ?? "TBD"}</p>
                   <p className="ui-text-sm ui-text-muted">Participants: {row.participantCount ?? 0}</p>

@@ -18,6 +18,16 @@ interface SessionsResponse {
   error?: string;
 }
 
+function statusBadgeClass(status: string) {
+  if (status === "open") {
+    return "border-[var(--app-status-open-border)] bg-[var(--app-status-open-bg)] text-[var(--app-status-open-text)]";
+  }
+  if (status === "finished") {
+    return "border-[var(--app-status-finished-border)] bg-[var(--app-status-finished-bg)] ui-text-muted";
+  }
+  return "border-[var(--app-status-draft-border)] bg-[var(--app-status-draft-bg)] text-[var(--app-primary)]";
+}
+
 function formatDate(value: string) {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
@@ -98,8 +108,14 @@ export function MySessionsManager() {
         <div className="space-y-3">
           {rows.map((row) => (
             <article key={row.id} className="ui-card">
-              <p className="font-semibold">{row.title}</p>
-              <p className="ui-text-sm ui-text-muted">Status: {row.status}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-semibold">{row.title}</p>
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${statusBadgeClass(row.status)}`}
+                >
+                  {row.status}
+                </span>
+              </div>
               <p className="ui-text-sm ui-text-muted">Starts: {formatDate(row.startsAt)}</p>
               <p className="ui-text-sm ui-text-muted">Venue: {row.venueName ?? "TBD"}</p>
               <p className="ui-text-sm ui-text-muted">Participants: {row.participantCount ?? 0}</p>
