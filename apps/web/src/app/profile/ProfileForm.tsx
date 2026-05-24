@@ -73,30 +73,30 @@ export function ProfileForm({ initialEmail }: ProfileFormProps) {
 
   return (
     <form onSubmit={onSubmit} className="mt-6 grid gap-3">
-      <input className="w-full rounded-xl border border-black/10 px-3 py-2" value={email} disabled />
+      <input className="ui-input w-full opacity-80" value={email} disabled />
       <input
-        className="w-full rounded-xl border border-black/10 px-3 py-2"
+        className="ui-input w-full"
         placeholder="Display name"
         value={displayName}
         onChange={(event) => setDisplayName(event.target.value)}
         required
       />
       <textarea
-        className="w-full rounded-xl border border-black/10 px-3 py-2"
+        className="ui-input w-full"
         rows={3}
         placeholder="Bio"
         value={bio}
         onChange={(event) => setBio(event.target.value)}
         disabled
       />
-      <p className="text-xs ui-text-muted">Bio editing will be enabled in a later migration.</p>
+      <p className="ui-text-xs ui-text-muted">Bio editing will be enabled in a later migration.</p>
       {message ? (
-        <p className={`text-sm ${isError ? "text-[var(--app-danger)]" : "text-green-700"}`}>{message}</p>
+        <p className={`ui-text-sm ${isError ? "text-[var(--app-danger)]" : "text-[var(--app-status-open-text)]"}`}>{message}</p>
       ) : null}
       <button
         type="submit"
         disabled={busy}
-        className="w-fit rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-60"
+        className="ui-button ui-button-primary w-fit disabled:opacity-60"
       >
         {busy ? "Saving..." : "Save changes"}
       </button>

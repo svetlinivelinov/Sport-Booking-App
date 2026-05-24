@@ -28,6 +28,7 @@ export interface AppTheme {
     size14: number;
     size16: number;
     size20: number;
+    size32: number;
     size64: number;
   };
   radius: {
@@ -38,6 +39,8 @@ export interface AppTheme {
   };
   colors: {
     background: string;
+    backgroundTop: string;
+    backgroundBottom: string;
     surface: string;
     surfaceMuted: string;
     surfaceStrong: string;
@@ -61,7 +64,7 @@ export interface AppTheme {
 }
 
 export const appTheme: AppTheme = {
-  id: "ocean-field",
+  id: "night-arena",
   fonts: {
     sans: "var(--font-brand-sans)",
     mono: "var(--font-brand-mono)",
@@ -90,6 +93,7 @@ export const appTheme: AppTheme = {
     size14: 14,
     size16: 16,
     size20: 20,
+    size32: 32,
     size64: 64,
   },
   radius: {
@@ -99,25 +103,27 @@ export const appTheme: AppTheme = {
     pill: 999,
   },
   colors: {
-    background: "#f5f8ff",
-    surface: "#ffffff",
-    surfaceMuted: "#eef2fa",
-    surfaceStrong: "#e7edf9",
-    foreground: "#10203a",
-    muted: "#5c6b85",
-    primary: "#1d5cff",
-    onPrimary: "#ffffff",
-    accent: "#11a36b",
-    danger: "#d33a2c",
-    dangerText: "#b42318",
-    borderSoft: "#dbe2f0",
-    borderMuted: "#d2d7e5",
-    statusOpenBg: "#e8f7ef",
-    statusOpenBorder: "#9dd8b8",
-    statusOpenText: "#0c7a48",
-    statusDraftBg: "#e9f0ff",
-    statusDraftBorder: "#bdd1ff",
-    statusFinishedBg: "#f1f3f8",
-    statusFinishedBorder: "#d2d7e5",
+    background: "#0a2240",
+    backgroundTop: "#194b88",
+    backgroundBottom: "#081a2b",
+    surface: "#32485d",
+    surfaceMuted: "#2a3f55",
+    surfaceStrong: "#3a5470",
+    foreground: "#eaf3ff",
+    muted: "#a8bdd0",
+    primary: "#25d7df",
+    onPrimary: "#052229",
+    accent: "#2f67ff",
+    danger: "#e45757",
+    dangerText: "#ff8b8b",
+    borderSoft: "#4a617a",
+    borderMuted: "#5a7390",
+    statusOpenBg: "#163e3a",
+    statusOpenBorder: "#2f8f86",
+    statusOpenText: "#76e7db",
+    statusDraftBg: "#16315a",
+    statusDraftBorder: "#2f67ff",
+    statusFinishedBg: "#253548",
+    statusFinishedBorder: "#4a617a",
   },
 };

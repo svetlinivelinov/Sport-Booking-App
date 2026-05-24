@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
     borderColor: appTheme.colors.borderSoft,
     borderRadius: appTheme.radius.size12,
     padding: 12,
+    backgroundColor: appTheme.colors.background,
   },
   metricCard: {
     width: "48.5%",
@@ -216,6 +217,7 @@ const styles = StyleSheet.create({
     borderColor: appTheme.colors.borderSoft,
     borderRadius: appTheme.radius.size12,
     padding: 12,
+    backgroundColor: appTheme.colors.background,
   },
   metricLabel: {
     color: appTheme.colors.muted,
@@ -273,7 +275,7 @@ const styles = StyleSheet.create({
     borderRadius: appTheme.radius.size12,
     padding: 12,
     gap: appTheme.spacing.size2,
-    backgroundColor: appTheme.colors.surface,
+    backgroundColor: appTheme.colors.background,
   },
   feedTopRow: {
     flexDirection: "row",

@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: appTheme.radius.size12,
     padding: 12,
     gap: appTheme.spacing.size4,
-    backgroundColor: appTheme.colors.surface,
+    backgroundColor: appTheme.colors.background,
   },
   itemTitle: {
     fontSize: appTheme.typography.size15,

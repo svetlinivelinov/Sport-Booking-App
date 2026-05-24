@@ -2,6 +2,8 @@
 
 :root {
   --app-bg: #f5f8ff;
+  --app-bg-top: #194b88;
+  --app-bg-bottom: #081a2b;
   --app-surface: #ffffff;
   --app-surface-muted: #eef2fa;
   --app-surface-strong: #e7edf9;
@@ -44,6 +46,7 @@
   --app-space-14: 14px;
   --app-space-16: 16px;
   --app-space-20: 20px;
+  --app-space-32: 32px;
   --app-space-64: 64px;
   --app-radius-10: 10px;
   --app-radius-12: 12px;
@@ -59,7 +62,8 @@
 }
 
 body {
-  background: var(--app-bg);
+  background: linear-gradient(180deg, var(--app-bg-top) 0%, var(--app-bg-bottom) 100%);
+  background-attachment: fixed;
   color: var(--app-fg);
   font-family: var(--app-font-sans);
 }

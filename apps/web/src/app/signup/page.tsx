@@ -39,9 +39,9 @@ export default function SignupPage() {
     <div className="min-h-full">
       <PublicNav />
       <main className="mx-auto max-w-md px-6 py-14">
-        <section className="rounded-3xl border border-black/5 bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-bold tracking-tight">Create account</h1>
-          <p className="mt-2 text-sm ui-text-muted">Start organizing sessions for your sport community.</p>
+        <section className="ui-section p-8">
+          <h1 className="ui-heading-page">Create account</h1>
+          <p className="mt-2 ui-text-sm ui-text-muted">Start organizing sessions for your sport community.</p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <label className="block">
               <span className="mb-1 block text-sm font-medium">Display name</span>
@@ -50,7 +50,7 @@ export default function SignupPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
-                className="w-full rounded-xl border border-black/10 px-3 py-2 outline-none focus:border-[var(--app-primary)]"
+                className="ui-input w-full"
               />
             </label>
             <label className="block">
@@ -60,7 +60,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-xl border border-black/10 px-3 py-2 outline-none focus:border-[var(--app-primary)]"
+                className="ui-input w-full"
               />
             </label>
             <label className="block">
@@ -71,14 +71,14 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={8}
                 required
-                className="w-full rounded-xl border border-black/10 px-3 py-2 outline-none focus:border-[var(--app-primary)]"
+                className="ui-input w-full"
               />
             </label>
-            {message ? <p className="text-sm text-[var(--app-danger)]">{message}</p> : null}
+            {message ? <p className="ui-text-sm text-[var(--app-danger)]">{message}</p> : null}
             <button
               type="submit"
               disabled={busy}
-              className="w-full rounded-xl bg-[var(--app-primary)] px-4 py-2.5 font-semibold text-white disabled:opacity-60"
+              className="ui-button ui-button-primary w-full disabled:opacity-60"
             >
               {busy ? "Creating..." : "Create account"}
             </button>

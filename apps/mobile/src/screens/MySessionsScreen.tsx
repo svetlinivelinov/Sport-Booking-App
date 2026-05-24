@@ -145,10 +145,11 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
+    minHeight: 0,
   },
   listContent: {
     gap: appTheme.spacing.size10,
-    paddingBottom: appTheme.spacing.size8,
+    paddingBottom: appTheme.spacing.size20,
   },
   item: {
     borderWidth: 1,
@@ -156,6 +157,7 @@ const styles = StyleSheet.create({
     borderRadius: appTheme.radius.size12,
     padding: 12,
     gap: appTheme.spacing.size3,
+    backgroundColor: appTheme.colors.background,
   },
   itemTitle: {
     fontSize: appTheme.typography.size16,

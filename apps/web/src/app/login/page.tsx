@@ -39,9 +39,9 @@ export default function LoginPage() {
     <div className="min-h-full">
       <PublicNav />
       <main className="mx-auto max-w-md px-6 py-14">
-        <section className="rounded-3xl border border-black/5 bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-bold tracking-tight">Login</h1>
-          <p className="mt-2 text-sm ui-text-muted">Access your dashboard and active sessions.</p>
+        <section className="ui-section p-8">
+          <h1 className="ui-heading-page">Login</h1>
+          <p className="mt-2 ui-text-sm ui-text-muted">Access your dashboard and active sessions.</p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <label className="block">
               <span className="mb-1 block text-sm font-medium">Email</span>
@@ -50,7 +50,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-xl border border-black/10 px-3 py-2 outline-none focus:border-[var(--app-primary)]"
+                className="ui-input w-full"
               />
             </label>
             <label className="block">
@@ -60,14 +60,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-xl border border-black/10 px-3 py-2 outline-none focus:border-[var(--app-primary)]"
+                className="ui-input w-full"
               />
             </label>
-            {message ? <p className="text-sm text-[var(--app-danger)]">{message}</p> : null}
+            {message ? <p className="ui-text-sm text-[var(--app-danger)]">{message}</p> : null}
             <button
               type="submit"
               disabled={busy}
-              className="w-full rounded-xl bg-[var(--app-primary)] px-4 py-2.5 font-semibold text-white disabled:opacity-60"
+              className="ui-button ui-button-primary w-full disabled:opacity-60"
             >
               {busy ? "Signing in..." : "Sign in"}
             </button>

@@ -25,6 +25,8 @@ export default function RootLayout({
 }>) {
   const themeVars: React.CSSProperties = {
     ["--app-bg" as string]: appTheme.colors.background,
+    ["--app-bg-top" as string]: appTheme.colors.backgroundTop,
+    ["--app-bg-bottom" as string]: appTheme.colors.backgroundBottom,
     ["--app-surface" as string]: appTheme.colors.surface,
     ["--app-surface-muted" as string]: appTheme.colors.surfaceMuted,
     ["--app-surface-strong" as string]: appTheme.colors.surfaceStrong,
@@ -67,6 +69,7 @@ export default function RootLayout({
     ["--app-space-14" as string]: `${appTheme.spacing.size14}px`,
     ["--app-space-16" as string]: `${appTheme.spacing.size16}px`,
     ["--app-space-20" as string]: `${appTheme.spacing.size20}px`,
+    ["--app-space-32" as string]: `${appTheme.spacing.size32}px`,
     ["--app-space-64" as string]: `${appTheme.spacing.size64}px`,
     ["--app-radius-10" as string]: `${appTheme.radius.size10}px`,
     ["--app-radius-12" as string]: `${appTheme.radius.size12}px`,

@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useFonts } from 'expo-font';
 import { Manrope_400Regular, Manrope_600SemiBold, Manrope_700Bold } from '@expo-google-fonts/manrope';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { appTheme } from '@sport-booking/shared';
 import { DashboardScreen } from './src/screens/DashboardScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
@@ -15,8 +16,7 @@ import { mobileFonts } from './src/ui/fonts';
 
 type ScreenKey = 'login' | 'dashboard' | 'groups' | 'events' | 'my-sessions' | 'results' | 'profile';
 
-const tabs: Array<{ key: ScreenKey; label: string }> = [
-  { key: 'login', label: 'Login' },
+const baseTabs: Array<{ key: ScreenKey; label: string }> = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'groups', label: 'Groups' },
   { key: 'events', label: 'Events' },
@@ -34,6 +34,13 @@ export default function App() {
   const [screen, setScreen] = useState<ScreenKey>('login');
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [sessionRefreshKey, setSessionRefreshKey] = useState(0);
+    const tabs = useMemo<Array<{ key: ScreenKey; label: string }>>(
+      () => [{ key: 'login', label: authToken ? 'Logout' : 'Login' }, ...baseTabs],
+      [authToken],
+    );
+
+  const { height } = useWindowDimensions();
+  const isCompactHeight = height < 760;
 
   function onSessionChange() {
     setSessionRefreshKey((prev) => prev + 1);
@@ -73,51 +80,83 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Sport Booking App v1</Text>
-        <Text style={styles.headerSubtitle}>
-          {authToken ? 'Authenticated with Bearer token flow' : 'Global theme and MVP screen flow'}
-        </Text>
+    <View style={styles.root}>
+      <LinearGradient
+        colors={[appTheme.colors.backgroundTop, appTheme.colors.backgroundBottom]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.backgroundGradient}
+      />
+
+      <View style={[styles.container, isCompactHeight && styles.containerCompact]}>
+        <View style={[styles.header, isCompactHeight && styles.headerCompact]}>
+          <Text style={styles.headerTitle}>Sport Booking App v1</Text>
+          <Text style={styles.headerSubtitle}>
+            {authToken ? 'Authenticated with Bearer token flow' : 'Global theme and MVP screen flow'}
+          </Text>
+        </View>
+
+        <View style={[styles.card, isCompactHeight && styles.cardCompact]}>{content}</View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.tabScroll}
+          contentContainerStyle={styles.tabRow}
+        >
+          {tabs.map((tab) => {
+            const active = tab.key === screen;
+            return (
+              <Pressable
+                key={tab.key}
+                onPress={() => {
+                  if (tab.key === 'login' && authToken) {
+                    setAuthToken(null);
+                    setSessionRefreshKey(0);
+                    setScreen('login');
+                    return;
+                  }
+                  setScreen(tab.key);
+                }}
+                style={[styles.tab, active && styles.tabActive]}
+              >
+                <Text style={[styles.tabText, active && styles.tabTextActive]}>{tab.label}</Text>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+
+        <StatusBar style="light" />
       </View>
-
-      <View style={styles.card}>{content}</View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabScroll}
-        contentContainerStyle={styles.tabRow}
-      >
-        {tabs.map((tab) => {
-          const active = tab.key === screen;
-          return (
-            <Pressable
-              key={tab.key}
-              onPress={() => setScreen(tab.key)}
-              style={[styles.tab, active && styles.tabActive]}
-            >
-              <Text style={[styles.tabText, active && styles.tabTextActive]}>{tab.label}</Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      <StatusBar style="auto" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    minHeight: 0,
+  },
+  backgroundGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
   container: {
     flex: 1,
-    backgroundColor: appTheme.colors.background,
+    backgroundColor: 'transparent',
     paddingHorizontal: appTheme.spacing.size20,
     paddingTop: appTheme.spacing.size64,
+    paddingBottom: appTheme.spacing.size32,
+    minHeight: 0,
+  },
+  containerCompact: {
+    paddingTop: appTheme.spacing.size20,
     paddingBottom: appTheme.spacing.size20,
   },
   header: {
     marginBottom: 14,
+  },
+  headerCompact: {
+    marginBottom: appTheme.spacing.size8,
   },
   headerTitle: {
     color: appTheme.colors.foreground,
@@ -132,22 +171,27 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
+    minHeight: 0,
     backgroundColor: appTheme.colors.surface,
     borderRadius: appTheme.radius.size18,
     padding: 16,
     borderWidth: 1,
     borderColor: appTheme.colors.borderSoft,
   },
+  cardCompact: {
+    padding: appTheme.spacing.size12,
+  },
   tabRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: appTheme.spacing.size8,
     paddingTop: appTheme.spacing.size14,
-    paddingBottom: appTheme.spacing.size6,
+    paddingBottom: appTheme.spacing.size14,
   },
   tabScroll: {
     flexGrow: 0,
     flexShrink: 0,
+    marginBottom: appTheme.spacing.size2,
   },
   tab: {
     flexShrink: 0,
