@@ -47,11 +47,18 @@ export function AppNav() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    for (const link of appLinks) {
+      router.prefetch(link.href);
+    }
+    router.prefetch("/admin");
+  }, [router]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadRole() {
       try {
-        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        const response = await fetch("/api/auth/me");
         if (!response.ok) {
           if (!cancelled) {
             setIsAdmin(false);
