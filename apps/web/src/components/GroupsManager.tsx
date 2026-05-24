@@ -205,20 +205,20 @@ export function GroupsManager() {
 
   return (
     <main className="mx-auto grid max-w-5xl gap-6 px-6 py-10 lg:grid-cols-2">
-      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight">Create group</h1>
-        <p className="mt-2 text-sm text-[var(--app-muted)]">Start a community and invite players around a sport.</p>
+      <section className="ui-section">
+        <h1 className="ui-metric-value tracking-tight">Create group</h1>
+        <p className="mt-2 ui-text-sm ui-text-muted">Start a community and invite players around a sport.</p>
 
         <form className="mt-5 space-y-3" onSubmit={onCreate}>
           <input
-            className="w-full rounded-xl border border-black/10 px-3 py-2"
+            className="ui-input w-full"
             placeholder="Group name"
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
           />
           <textarea
-            className="w-full rounded-xl border border-black/10 px-3 py-2"
+            className="ui-input w-full"
             rows={3}
             placeholder="Description"
             value={description}
@@ -227,31 +227,31 @@ export function GroupsManager() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-60"
+            className="ui-button ui-button-primary disabled:opacity-60"
           >
             {saving ? "Creating..." : "Create group"}
           </button>
         </form>
       </section>
 
-      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold">My groups</h2>
-        {loading ? <p className="mt-2 text-sm text-[var(--app-muted)]">Loading groups...</p> : null}
-        {!loading && myGroups.length === 0 ? <p className="mt-2 text-sm text-[var(--app-muted)]">You have not joined any groups yet.</p> : null}
+      <section className="ui-section">
+        <h2 className="ui-heading-section">My groups</h2>
+        {loading ? <p className="mt-2 ui-text-sm ui-text-muted">Loading groups...</p> : null}
+        {!loading && myGroups.length === 0 ? <p className="mt-2 ui-text-sm ui-text-muted">You have not joined any groups yet.</p> : null}
 
         <div className="mt-4 space-y-3">
           {myGroups.map((row) => (
-            <article key={row.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
+            <article key={row.id} className="ui-card">
               {editingId === row.id ? (
                 <div className="space-y-2">
                   <input
-                    className="w-full rounded-xl border border-black/10 px-3 py-2"
+                    className="ui-input w-full"
                     value={editName}
                     onChange={(event) => setEditName(event.target.value)}
                     required
                   />
                   <textarea
-                    className="w-full rounded-xl border border-black/10 px-3 py-2"
+                    className="ui-input w-full"
                     rows={3}
                     value={editDescription}
                     onChange={(event) => setEditDescription(event.target.value)}
@@ -261,14 +261,14 @@ export function GroupsManager() {
                       type="button"
                       onClick={() => void saveEdit(row.id)}
                       disabled={updating}
-                      className="rounded-xl bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                      className="ui-button ui-button-primary disabled:opacity-60"
                     >
                       {updating ? "Saving..." : "Save"}
                     </button>
                     <button
                       type="button"
                       onClick={cancelEdit}
-                      className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                      className="ui-button ui-button-neutral"
                     >
                       Cancel
                     </button>
@@ -278,26 +278,26 @@ export function GroupsManager() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold">{row.name}</p>
-                    <p className="text-sm text-[var(--app-muted)]">
+                    <p className="ui-text-sm ui-text-muted">
                       {row.sportName} · {row.memberCount} members · {row.memberRole ?? "member"}
                     </p>
-                    {row.description ? <p className="mt-1 text-sm text-[var(--app-muted)]">{row.description}</p> : null}
+                    {row.description ? <p className="mt-1 ui-text-sm ui-text-muted">{row.description}</p> : null}
                   </div>
                   {!row.isOwner ? (
                     <button
                       type="button"
                       onClick={() => void leaveGroup(row.id)}
-                      className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                      className="ui-button ui-button-neutral"
                     >
                       Leave
                     </button>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className="rounded-xl bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white">Owner</span>
+                      <span className="ui-button ui-button-primary">Owner</span>
                       <button
                         type="button"
                         onClick={() => startEdit(row)}
-                        className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                        className="ui-button ui-button-neutral"
                       >
                         Edit
                       </button>
@@ -305,7 +305,7 @@ export function GroupsManager() {
                         type="button"
                         onClick={() => void deleteOwnedGroup(row.id)}
                         disabled={deletingId === row.id}
-                        className="rounded-xl bg-[var(--app-danger)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                        className="ui-button ui-button-danger disabled:opacity-60"
                       >
                         {deletingId === row.id ? "Deleting..." : "Delete"}
                       </button>
@@ -318,22 +318,22 @@ export function GroupsManager() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm lg:col-span-2">
-        <h2 className="text-xl font-semibold">Discover groups</h2>
+      <section className="ui-section lg:col-span-2">
+        <h2 className="ui-heading-section">Discover groups</h2>
         {!loading && discoverGroups.length === 0 ? (
-          <p className="mt-2 text-sm text-[var(--app-muted)]">No available groups to join right now.</p>
+          <p className="mt-2 ui-text-sm ui-text-muted">No available groups to join right now.</p>
         ) : null}
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {discoverGroups.map((row) => (
-            <article key={row.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
+            <article key={row.id} className="ui-card">
               <p className="font-semibold">{row.name}</p>
-              <p className="text-sm text-[var(--app-muted)]">{row.sportName} · {row.memberCount} members</p>
-              {row.description ? <p className="mt-1 text-sm text-[var(--app-muted)]">{row.description}</p> : null}
+              <p className="ui-text-sm ui-text-muted">{row.sportName} · {row.memberCount} members</p>
+              {row.description ? <p className="mt-1 ui-text-sm ui-text-muted">{row.description}</p> : null}
               <button
                 type="button"
                 onClick={() => void joinGroup(row.id)}
-                className="mt-3 rounded-xl bg-[var(--app-accent)] px-3 py-1.5 text-sm font-semibold text-white"
+                className="mt-3 ui-button ui-button-accent"
               >
                 Join group
               </button>
@@ -343,7 +343,7 @@ export function GroupsManager() {
       </section>
 
       {message ? (
-        <p className="lg:col-span-2 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-[var(--app-muted)]">{message}</p>
+        <p className="lg:col-span-2 ui-card ui-text-sm ui-text-muted">{message}</p>
       ) : null}
     </main>
   );

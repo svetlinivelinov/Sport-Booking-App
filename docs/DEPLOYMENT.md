@@ -62,6 +62,23 @@ Suggested hosts: Vercel or Netlify.
 
 Use Neon for database and Netlify for hosting.
 
+## Exact Inputs You Need Ready
+
+- GitHub repository URL:
+   - `https://github.com/svetlinivelinov/Sport-Booking-App`
+- Production database URL from Neon:
+   - `DATABASE_URL=<neon-connection-string>`
+- Production JWT secret:
+   - `JWT_SECRET=<strong-random-value>`
+- Production API URL (after web deploy):
+   - `EXPO_PUBLIC_API_BASE_URL=<https://your-web-site.netlify.app>`
+
+Generate a JWT secret quickly:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
+```
+
 ### 1. Neon Postgres (Database)
 
 1. Create a Neon project and database.
@@ -84,15 +101,38 @@ Create a Netlify site connected to this repository with these settings:
    - `/api/health`
    - `/api/sessions?page=1&pageSize=20`
 
+Web site checklist:
+
+- [ ] Netlify site connected to `main` branch
+- [ ] Base directory set to `apps/web`
+- [ ] `DATABASE_URL` set
+- [ ] `JWT_SECRET` set
+- [ ] `NODE_ENV=production` set
+- [ ] First deploy succeeded
+- [ ] `https://<web-url>/api/health` returns OK
+- [ ] `https://<web-url>/api/sessions?page=1&pageSize=20` returns data with auth token
+
 ### 3. Netlify for Mobile Web Export (Optional Second Site)
 
 If you want the Expo web build hosted on Netlify as a separate frontend:
 
 1. Run `npm run build:mobile:web`.
 2. Create a second Netlify site.
-3. Set publish directory to `apps/mobile/dist`.
+3. Build settings:
+   - Base directory: leave empty (repo root)
+   - Build command: `npm run build:mobile:web`
+   - Publish directory: `apps/mobile/dist`
 4. Set `EXPO_PUBLIC_API_BASE_URL` to your deployed Next.js URL.
 5. Redeploy mobile site after changing API base URL.
+
+Mobile site checklist:
+
+- [ ] Netlify mobile site created
+- [ ] Build command set to `npm run build:mobile:web`
+- [ ] Publish directory set to `apps/mobile/dist`
+- [ ] `EXPO_PUBLIC_API_BASE_URL` set to deployed web URL
+- [ ] Deploy succeeded and app loads
+- [ ] Login works against deployed backend
 
 ## Mobile Web Deployment (Expo Export)
 
@@ -109,7 +149,17 @@ If you want the Expo web build hosted on Netlify as a separate frontend:
 - 10k+ dataset tested with pagination
 - Commit history requirements satisfied
 
-## Current Local Verification Snapshot
+Final handoff checklist:
+
+- [ ] Add live URLs and demo credentials in `docs/Capstone.md`
+- [ ] Confirm web + mobile URLs are reachable from incognito window
+- [ ] Confirm at least one end-to-end flow on deployed environment:
+   - login -> join session -> submit score -> results visible
+
+## Current Local Verification Snapshot (May 24, 2026)
 
 - `npm run check:web-env`: PASS
 - `npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`: PASS
+- `npm run build:web`: PASS
+- `npm run build:mobile:web`: PASS
+- `git push origin main`: PASS (`9f81ebc`, `29a8f5e`)

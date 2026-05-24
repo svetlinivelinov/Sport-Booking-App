@@ -70,25 +70,25 @@ export function LoginScreen({ onContinue }: LoginScreenProps) {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 12,
+    gap: appTheme.spacing.size12,
   },
   title: {
-    fontSize: 28,
+    fontSize: appTheme.typography.size28,
     color: appTheme.colors.foreground,
     fontFamily: mobileFonts.bold,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: appTheme.typography.size14,
     color: appTheme.colors.muted,
     marginBottom: 4,
     fontFamily: mobileFonts.regular,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#dbe2f0",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderColor: appTheme.colors.borderSoft,
+    borderRadius: appTheme.radius.size12,
+    paddingHorizontal: appTheme.spacing.size12,
+    paddingVertical: appTheme.spacing.size10,
     backgroundColor: appTheme.colors.surface,
     color: appTheme.colors.foreground,
     fontFamily: mobileFonts.regular,
@@ -96,20 +96,20 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 6,
     backgroundColor: appTheme.colors.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
+    borderRadius: appTheme.radius.size12,
+    paddingVertical: appTheme.spacing.size12,
     alignItems: "center",
   },
   buttonDisabled: {
     opacity: 0.7,
   },
   buttonText: {
-    color: "#fff",
+    color: appTheme.colors.onPrimary,
     fontFamily: mobileFonts.bold,
   },
   secondaryButton: {
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: appTheme.spacing.size10,
   },
   secondaryButtonText: {
     color: appTheme.colors.primary,

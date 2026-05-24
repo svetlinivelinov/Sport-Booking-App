@@ -41,7 +41,7 @@ export default function LoginPage() {
       <main className="mx-auto max-w-md px-6 py-14">
         <section className="rounded-3xl border border-black/5 bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold tracking-tight">Login</h1>
-          <p className="mt-2 text-sm text-[var(--app-muted)]">Access your dashboard and active sessions.</p>
+          <p className="mt-2 text-sm ui-text-muted">Access your dashboard and active sessions.</p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <label className="block">
               <span className="mb-1 block text-sm font-medium">Email</span>

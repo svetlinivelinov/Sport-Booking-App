@@ -3,19 +3,48 @@ This project assignment for the course “Full Stack Apps with AI” in SoftUni 
 
 ## Submission Metadata
 
-- Author: TODO
-- Email: TODO
-- GitHub Repo: TODO
+- Author: Svetlin_Ivanov
+- Email: svetlin.ivelinov@gmail.com
+- GitHub Repo: https://github.com/svetlinivelinov/Sport-Booking-App
 - Web Project Live URL: TODO
 - Expo Project Live URL: TODO
 - Credentials for testing (login + pass): TODO
 
-## Delivery Status (May 22, 2026)
+## Delivery Status (May 24, 2026)
 
-- Local env validation: PASS (`npm run check:web-env`)
+- Preflight env validation: PASS (`npm run check:web-env`)
 - Local smoke checks: PASS (`npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`)
+- Web production build: PASS (`npm run build:web`)
+- Mobile web export build: PASS (`npm run build:mobile:web`)
+- Git push to main: PASS (`9f81ebc`, `29a8f5e`)
 - Web deployment: PENDING
 - Expo web export deployment: PENDING
+
+## Final Submission Block (Copy/Paste)
+
+```md
+Author: Svetlin_Ivanov
+Email: svetlin.ivelinov@gmail.com
+GitHub Repo: https://github.com/svetlinivelinov/Sport-Booking-App
+Web Project Live URL: <NETLIFY_WEB_URL>
+Expo Project Live URL: <NETLIFY_MOBILE_URL>
+Credentials for testing (login + pass): <DEMO_EMAIL> / <DEMO_PASSWORD>
+
+Validation Snapshot:
+- Local env validation: PASS (`npm run check:web-env`)
+- Local smoke checks: PASS (`npm run test:smoke -- -WebUrl http://localhost:3010 -MobileUrl http://localhost:8081`)
+- Production web build: PASS (`npm run build:web`)
+- Mobile web export build: PASS (`npm run build:mobile:web`)
+- Git push to main: PASS (`9f81ebc`, `29a8f5e`)
+```
+
+## Fill Checklist
+
+- [ ] Replace `<NETLIFY_WEB_URL>`
+- [ ] Replace `<NETLIFY_MOBILE_URL>`
+- [ ] Replace `<DEMO_EMAIL>` and `<DEMO_PASSWORD>`
+- [ ] Mark web deployment as complete in this file
+- [ ] Mark expo deployment as complete in this file
 
 * If you have a good reason to keep your codebase or app private, contact the training team for instructions.
     1. Project Assignment

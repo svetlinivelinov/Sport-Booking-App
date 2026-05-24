@@ -70,50 +70,50 @@ export function ProfileScreen({ token }: ProfileScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 10 },
+  container: { gap: appTheme.spacing.size10 },
   title: {
-    fontSize: 24,
+    fontSize: appTheme.typography.size24,
     color: appTheme.colors.foreground,
     fontFamily: mobileFonts.bold,
   },
   subtitle: {
     color: appTheme.colors.muted,
-    fontSize: 14,
+    fontSize: appTheme.typography.size14,
     fontFamily: mobileFonts.regular,
   },
   panel: {
-    gap: 4,
+    gap: appTheme.spacing.size4,
     borderWidth: 1,
-    borderColor: "#dbe2f0",
-    borderRadius: 12,
+    borderColor: appTheme.colors.borderSoft,
+    borderRadius: appTheme.radius.size12,
     padding: 12,
     backgroundColor: appTheme.colors.surface,
   },
   label: {
-    fontSize: 12,
+    fontSize: appTheme.typography.size12,
     color: appTheme.colors.muted,
     fontFamily: mobileFonts.regular,
   },
   value: {
-    fontSize: 15,
+    fontSize: appTheme.typography.size15,
     color: appTheme.colors.foreground,
     marginBottom: 4,
     fontFamily: mobileFonts.semiBold,
   },
   error: {
-    color: "#b42318",
-    fontSize: 13,
+    color: appTheme.colors.dangerText,
+    fontSize: appTheme.typography.size13,
     fontFamily: mobileFonts.regular,
   },
   button: {
     marginTop: 4,
     alignItems: "center",
-    borderRadius: 10,
-    paddingVertical: 10,
+    borderRadius: appTheme.radius.size10,
+    paddingVertical: appTheme.spacing.size10,
     backgroundColor: appTheme.colors.primary,
   },
   buttonText: {
-    color: "#fff",
+    color: appTheme.colors.onPrimary,
     fontFamily: mobileFonts.bold,
   },
 });

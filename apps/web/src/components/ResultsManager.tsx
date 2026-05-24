@@ -119,25 +119,25 @@ export function ResultsManager() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-4xl font-bold tracking-tight">Results</h1>
-      <p className="mt-2 text-[var(--app-muted)]">Browse completed matchup scores and leaderboard standings.</p>
+      <h1 className="ui-heading-page">Results</h1>
+      <p className="mt-2 ui-text-muted">Browse completed matchup scores and leaderboard standings.</p>
 
-      <section className="mt-8 rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
+      <section className="mt-8 ui-section">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold">Filters</h2>
+          <h2 className="ui-heading-section">Filters</h2>
           <button
             type="button"
             onClick={() => void loadResults()}
-            className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+            className="ui-button ui-button-neutral"
           >
             Refresh
           </button>
         </div>
 
-        <label className="mt-3 block text-sm text-[var(--app-muted)]">
+        <label className="mt-3 block ui-text-sm ui-text-muted">
           Session
           <select
-            className="mt-1 w-full rounded-xl border border-black/10 px-3 py-2 text-[var(--app-foreground)]"
+            className="mt-1 ui-input w-full text-[var(--app-fg)]"
             value={sessionId}
             onChange={(event) => setSessionId(event.target.value)}
           >
@@ -152,14 +152,14 @@ export function ResultsManager() {
       </section>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-2">
-        <article className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Leaderboard</h2>
-          {!leaderboard.length ? <p className="mt-2 text-sm text-[var(--app-muted)]">No leaderboard entries yet.</p> : null}
+        <article className="ui-section">
+          <h2 className="ui-heading-section">Leaderboard</h2>
+          {!leaderboard.length ? <p className="mt-2 ui-text-sm ui-text-muted">No leaderboard entries yet.</p> : null}
           <div className="mt-4 space-y-2">
             {leaderboard.map((row) => (
-              <div key={row.userId} className="rounded-xl border border-black/5 bg-[var(--app-bg)] px-3 py-2 text-sm">
+              <div key={row.userId} className="rounded-xl border border-[var(--app-border-soft)] bg-[var(--app-bg)] px-3 py-2 text-sm">
                 <p className="font-semibold">{row.displayName}</p>
-                <p className="text-[var(--app-muted)]">
+                <p className="ui-text-muted">
                   W: {row.wins} · L: {row.losses} · D: {row.draws}
                 </p>
               </div>
@@ -167,18 +167,18 @@ export function ResultsManager() {
           </div>
         </article>
 
-        <article className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Recent results</h2>
-          {loading ? <p className="mt-2 text-sm text-[var(--app-muted)]">Loading results...</p> : null}
-          {!loading && !rows.length ? <p className="mt-2 text-sm text-[var(--app-muted)]">No result rows found.</p> : null}
+        <article className="ui-section">
+          <h2 className="ui-heading-section">Recent results</h2>
+          {loading ? <p className="mt-2 ui-text-sm ui-text-muted">Loading results...</p> : null}
+          {!loading && !rows.length ? <p className="mt-2 ui-text-sm ui-text-muted">No result rows found.</p> : null}
 
           <div className="mt-4 space-y-2">
             {rows.map((row) => (
-              <div key={row.matchupId} className="rounded-xl border border-black/5 bg-[var(--app-bg)] px-3 py-2 text-sm">
+              <div key={row.matchupId} className="rounded-xl border border-[var(--app-border-soft)] bg-[var(--app-bg)] px-3 py-2 text-sm">
                 <p className="font-semibold">
                   {row.sessionTitle} · R{row.roundNumber} S{row.slotNumber}
                 </p>
-                <p className="text-[var(--app-muted)]">
+                <p className="ui-text-muted">
                   {row.sideAUserIds.join(", ")} {row.sideAScore} - {row.sideBScore} {row.sideBUserIds.join(", ")}
                 </p>
               </div>
@@ -190,18 +190,18 @@ export function ResultsManager() {
               type="button"
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               disabled={page <= 1}
-              className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold disabled:opacity-60"
+              className="ui-button ui-button-neutral disabled:opacity-60"
             >
               Prev
             </button>
-            <p className="text-xs text-[var(--app-muted)]">
+            <p className="ui-text-xs ui-text-muted">
               Page {page} / {Math.max(1, totalPages)}
             </p>
             <button
               type="button"
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={page >= totalPages}
-              className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold disabled:opacity-60"
+              className="ui-button ui-button-neutral disabled:opacity-60"
             >
               Next
             </button>
@@ -209,7 +209,7 @@ export function ResultsManager() {
         </article>
       </section>
 
-      {message ? <p className="mt-6 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-[var(--app-muted)]">{message}</p> : null}
+      {message ? <p className="mt-6 ui-card ui-text-sm ui-text-muted">{message}</p> : null}
     </main>
   );
 }

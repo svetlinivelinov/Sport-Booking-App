@@ -245,11 +245,11 @@ export function EventsManager() {
   const sessionItems = useMemo(
     () =>
       sessions.map((row) => (
-        <article key={row.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
+        <article key={row.id} className="ui-card">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-semibold">{row.title}</p>
-              <p className="text-sm text-[var(--app-muted)]">
+              <p className="ui-text-sm ui-text-muted">
                 {new Date(row.startsAt).toLocaleString()} · {row.venueName ?? "TBA"} · {row.status}
               </p>
             </div>
@@ -257,7 +257,7 @@ export function EventsManager() {
               <button
                 type="button"
                 onClick={() => startEditing(row)}
-                className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                className="ui-button ui-button-neutral"
               >
                 Edit
               </button>
@@ -265,7 +265,7 @@ export function EventsManager() {
                 <button
                   type="button"
                   onClick={() => void finalizeSession(row.id)}
-                  className="rounded-xl bg-[var(--app-accent)] px-3 py-1.5 text-sm font-semibold text-white"
+                  className="ui-button ui-button-accent"
                 >
                   Finalize
                 </button>
@@ -273,23 +273,23 @@ export function EventsManager() {
             </div>
           </div>
           {editingId === row.id ? (
-            <div className="mt-4 space-y-2 rounded-xl border border-black/10 bg-white p-3">
+            <div className="mt-4 space-y-2 rounded-xl border border-[var(--app-border-soft)] bg-[var(--app-surface)] p-3">
               <input
-                className="w-full rounded-xl border border-black/10 px-3 py-2"
+                className="ui-input w-full"
                 placeholder="Session title"
                 value={editTitle}
                 onChange={(event) => setEditTitle(event.target.value)}
                 required
               />
               <input
-                className="w-full rounded-xl border border-black/10 px-3 py-2"
+                className="ui-input w-full"
                 placeholder="Venue"
                 value={editVenueName}
                 onChange={(event) => setEditVenueName(event.target.value)}
               />
               <input
                 type="datetime-local"
-                className="w-full rounded-xl border border-black/10 px-3 py-2"
+                className="ui-input w-full"
                 value={editStartsAtLocal}
                 onChange={(event) => setEditStartsAtLocal(event.target.value)}
                 required
@@ -299,14 +299,14 @@ export function EventsManager() {
                   type="button"
                   onClick={() => void saveSessionChanges(row.id)}
                   disabled={updating}
-                  className="rounded-xl bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                  className="ui-button ui-button-primary disabled:opacity-60"
                 >
                   {updating ? "Saving..." : "Save changes"}
                 </button>
                 <button
                   type="button"
                   onClick={cancelEditing}
-                  className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                  className="ui-button ui-button-neutral"
                 >
                   Cancel
                 </button>
@@ -321,19 +321,19 @@ export function EventsManager() {
   const discoverItems = useMemo(
     () =>
       discoverSessions.map((row) => (
-        <article key={row.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
+        <article key={row.id} className="ui-card">
           <p className="font-semibold">{row.title}</p>
-          <p className="text-sm text-[var(--app-muted)]">
+          <p className="ui-text-sm ui-text-muted">
             {new Date(row.startsAt).toLocaleString()} · {row.venueName ?? "TBA"} · {row.status}
           </p>
-          <p className="mt-1 text-xs text-[var(--app-muted)]">Participants: {row.participantCount ?? 0}</p>
+          <p className="mt-1 ui-text-xs ui-text-muted">Participants: {row.participantCount ?? 0}</p>
           <div className="mt-2">
             {row.isParticipant ? (
               <button
                 type="button"
                 onClick={() => void leaveSession(row.id)}
                 disabled={leavingId === row.id}
-                className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold disabled:opacity-60"
+                className="ui-button ui-button-neutral disabled:opacity-60"
               >
                 {leavingId === row.id ? "Leaving..." : "Leave"}
               </button>
@@ -342,7 +342,7 @@ export function EventsManager() {
                 type="button"
                 onClick={() => void joinSession(row.id)}
                 disabled={joiningId === row.id}
-                className="rounded-xl bg-[var(--app-accent)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                className="ui-button ui-button-accent disabled:opacity-60"
               >
                 {joiningId === row.id ? "Joining..." : "Join"}
               </button>
@@ -355,28 +355,28 @@ export function EventsManager() {
 
   return (
     <main className="mx-auto grid max-w-5xl gap-6 px-6 py-10 lg:grid-cols-2">
-      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight">Create session</h1>
-        <p className="mt-2 text-sm text-[var(--app-muted)]">Create a draft, then finalize it to make it active.</p>
+      <section className="ui-section">
+        <h1 className="ui-metric-value tracking-tight">Create session</h1>
+        <p className="mt-2 ui-text-sm ui-text-muted">Create a draft, then finalize it to make it active.</p>
         <form className="mt-5 space-y-3" onSubmit={onCreate}>
           <input
-            className="w-full rounded-xl border border-black/10 px-3 py-2"
+            className="ui-input w-full"
             placeholder="Session title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             required
           />
           <input
-            className="w-full rounded-xl border border-black/10 px-3 py-2"
+            className="ui-input w-full"
             placeholder="Venue"
             value={venueName}
             onChange={(event) => setVenueName(event.target.value)}
           />
           <label className="block">
-            <span className="mb-1 block text-sm font-medium text-[var(--app-muted)]">Date and time</span>
+            <span className="mb-1 block text-sm font-medium ui-text-muted">Date and time</span>
             <input
               type="datetime-local"
-              className="w-full rounded-xl border border-black/10 px-3 py-2"
+              className="ui-input w-full"
               value={startsAtLocal}
               onChange={(event) => setStartsAtLocal(event.target.value)}
               required
@@ -385,28 +385,28 @@ export function EventsManager() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-60"
+            className="ui-button ui-button-primary disabled:opacity-60"
           >
             {saving ? "Saving..." : "Save draft"}
           </button>
         </form>
       </section>
 
-      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold">Sessions</h2>
-        {loading ? <p className="mt-2 text-sm text-[var(--app-muted)]">Loading sessions...</p> : null}
-        {!loading && sessions.length === 0 ? <p className="mt-2 text-sm text-[var(--app-muted)]">No sessions yet.</p> : null}
+      <section className="ui-section">
+        <h2 className="ui-heading-section">Sessions</h2>
+        {loading ? <p className="mt-2 ui-text-sm ui-text-muted">Loading sessions...</p> : null}
+        {!loading && sessions.length === 0 ? <p className="mt-2 ui-text-sm ui-text-muted">No sessions yet.</p> : null}
         <div className="mt-4 space-y-3">{sessionItems}</div>
       </section>
 
-      <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm lg:col-span-2">
-        <h2 className="text-xl font-semibold">Join open sessions</h2>
-        {!discoverSessions.length ? <p className="mt-2 text-sm text-[var(--app-muted)]">No open sessions available.</p> : null}
+      <section className="ui-section lg:col-span-2">
+        <h2 className="ui-heading-section">Join open sessions</h2>
+        {!discoverSessions.length ? <p className="mt-2 ui-text-sm ui-text-muted">No open sessions available.</p> : null}
         <div className="mt-4 grid gap-3 md:grid-cols-2">{discoverItems}</div>
       </section>
 
       {message ? (
-        <p className="lg:col-span-2 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-[var(--app-muted)]">{message}</p>
+        <p className="lg:col-span-2 ui-card ui-text-sm ui-text-muted">{message}</p>
       ) : null}
     </main>
   );

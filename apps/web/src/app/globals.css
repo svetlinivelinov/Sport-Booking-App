@@ -3,13 +3,52 @@
 :root {
   --app-bg: #f5f8ff;
   --app-surface: #ffffff;
+  --app-surface-muted: #eef2fa;
+  --app-surface-strong: #e7edf9;
   --app-fg: #10203a;
   --app-muted: #5c6b85;
   --app-primary: #1d5cff;
+  --app-on-primary: #ffffff;
   --app-accent: #11a36b;
   --app-danger: #d33a2c;
+  --app-danger-text: #b42318;
+  --app-border-soft: #dbe2f0;
+  --app-border-muted: #d2d7e5;
+  --app-status-open-bg: #e8f7ef;
+  --app-status-open-border: #9dd8b8;
+  --app-status-open-text: #0c7a48;
+  --app-status-draft-bg: #e9f0ff;
+  --app-status-draft-border: #bdd1ff;
+  --app-status-finished-bg: #f1f3f8;
+  --app-status-finished-border: #d2d7e5;
   --app-font-sans: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   --app-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --app-text-10: 10px;
+  --app-text-12: 12px;
+  --app-text-13: 13px;
+  --app-text-14: 14px;
+  --app-text-15: 15px;
+  --app-text-16: 16px;
+  --app-text-18: 18px;
+  --app-text-24: 24px;
+  --app-text-26: 26px;
+  --app-text-28: 28px;
+  --app-space-2: 2px;
+  --app-space-3: 3px;
+  --app-space-4: 4px;
+  --app-space-6: 6px;
+  --app-space-7: 7px;
+  --app-space-8: 8px;
+  --app-space-10: 10px;
+  --app-space-12: 12px;
+  --app-space-14: 14px;
+  --app-space-16: 16px;
+  --app-space-20: 20px;
+  --app-space-64: 64px;
+  --app-radius-10: 10px;
+  --app-radius-12: 12px;
+  --app-radius-18: 18px;
+  --app-radius-pill: 999px;
 }
 
 @theme inline {
@@ -32,4 +71,124 @@ a {
 code,
 pre {
   font-family: var(--app-font-mono);
+}
+
+.ui-section {
+  border: 1px solid var(--app-border-soft);
+  background: var(--app-surface);
+  border-radius: var(--app-radius-12);
+  padding: var(--app-space-16);
+  box-shadow: 0 1px 2px rgb(16 32 58 / 0.08);
+}
+
+.ui-card {
+  border: 1px solid var(--app-border-soft);
+  background: var(--app-bg);
+  border-radius: var(--app-radius-12);
+  padding: var(--app-space-10) var(--app-space-12);
+}
+
+.ui-input {
+  border: 1px solid var(--app-border-soft);
+  border-radius: var(--app-radius-10);
+  padding: var(--app-space-7) var(--app-space-12);
+  background: var(--app-surface);
+}
+
+.ui-button {
+  border-radius: var(--app-radius-10);
+  padding: var(--app-space-6) var(--app-space-12);
+  font-size: var(--app-text-14);
+  font-weight: 600;
+}
+
+.ui-button-primary {
+  background: var(--app-primary);
+  color: var(--app-on-primary);
+}
+
+.ui-button-accent {
+  background: var(--app-accent);
+  color: var(--app-on-primary);
+}
+
+.ui-button-danger {
+  background: var(--app-danger);
+  color: var(--app-on-primary);
+}
+
+.ui-button-neutral {
+  border: 1px solid var(--app-border-soft);
+  background: var(--app-surface);
+}
+
+.ui-nav-pill {
+  border-radius: var(--app-radius-pill);
+  padding: var(--app-space-6) var(--app-space-12);
+  font-size: var(--app-text-14);
+  line-height: 1.25;
+}
+
+.ui-nav-pill-active {
+  background: var(--app-primary);
+  color: var(--app-on-primary);
+  font-weight: 600;
+}
+
+.ui-nav-pill-muted {
+  color: var(--app-muted);
+  font-weight: 500;
+}
+
+.ui-nav-pill-muted:hover {
+  background: var(--app-surface-muted);
+}
+
+.ui-nav-pill-danger {
+  background: var(--app-danger);
+  color: var(--app-on-primary);
+  font-weight: 600;
+}
+
+.ui-brand-title {
+  font-size: var(--app-text-18);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ui-heading-page {
+  font-size: calc(var(--app-text-28) + var(--app-space-8));
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ui-heading-section {
+  font-size: var(--app-text-24);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ui-metric-value {
+  font-size: var(--app-text-28);
+  font-weight: 700;
+}
+
+.ui-text-xs {
+  font-size: var(--app-text-12);
+}
+
+.ui-text-sm {
+  font-size: var(--app-text-14);
+}
+
+.ui-text-muted {
+  color: var(--app-muted);
+}
+
+.ui-eyebrow {
+  font-size: var(--app-text-12);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--app-muted);
 }

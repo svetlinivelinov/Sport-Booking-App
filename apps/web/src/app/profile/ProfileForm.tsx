@@ -89,7 +89,7 @@ export function ProfileForm({ initialEmail }: ProfileFormProps) {
         onChange={(event) => setBio(event.target.value)}
         disabled
       />
-      <p className="text-xs text-[var(--app-muted)]">Bio editing will be enabled in a later migration.</p>
+      <p className="text-xs ui-text-muted">Bio editing will be enabled in a later migration.</p>
       {message ? (
         <p className={`text-sm ${isError ? "text-[var(--app-danger)]" : "text-green-700"}`}>{message}</p>
       ) : null}

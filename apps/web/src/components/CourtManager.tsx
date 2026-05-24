@@ -186,16 +186,16 @@ export function CourtManager() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-4xl font-bold tracking-tight">Court</h1>
-      <p className="mt-2 text-[var(--app-muted)]">Manage matchups and submit scores.</p>
+      <h1 className="ui-heading-page">Court</h1>
+      <p className="mt-2 ui-text-muted">Manage matchups and submit scores.</p>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-2">
-        <article className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Session selector</h2>
+        <article className="ui-section">
+          <h2 className="ui-heading-section">Session selector</h2>
           <select
             value={selectedSessionId}
             onChange={(event) => setSelectedSessionId(event.target.value)}
-            className="mt-3 w-full rounded-xl border border-black/10 px-3 py-2"
+            className="mt-3 ui-input w-full"
           >
             <option value="">Select a session</option>
             {sessions.map((session) => (
@@ -205,12 +205,12 @@ export function CourtManager() {
             ))}
           </select>
           {selectedSession ? (
-            <p className="mt-3 text-sm text-[var(--app-muted)]">Starts: {new Date(selectedSession.startsAt).toLocaleString()}</p>
+            <p className="mt-3 ui-text-sm ui-text-muted">Starts: {new Date(selectedSession.startsAt).toLocaleString()}</p>
           ) : null}
         </article>
 
-        <article className="rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Create matchup</h2>
+        <article className="ui-section">
+          <h2 className="ui-heading-section">Create matchup</h2>
           <form className="mt-3 space-y-2" onSubmit={onCreateMatchup}>
             <div className="grid grid-cols-2 gap-2">
               <input
@@ -218,7 +218,7 @@ export function CourtManager() {
                 min={1}
                 value={roundNumber}
                 onChange={(event) => setRoundNumber(event.target.value)}
-                className="rounded-xl border border-black/10 px-3 py-2"
+                className="ui-input"
                 placeholder="Round"
               />
               <input
@@ -226,26 +226,26 @@ export function CourtManager() {
                 min={1}
                 value={slotNumber}
                 onChange={(event) => setSlotNumber(event.target.value)}
-                className="rounded-xl border border-black/10 px-3 py-2"
+                className="ui-input"
                 placeholder="Slot"
               />
             </div>
             <input
               value={sideAUsers}
               onChange={(event) => setSideAUsers(event.target.value)}
-              className="w-full rounded-xl border border-black/10 px-3 py-2"
+              className="ui-input w-full"
               placeholder="Side A user IDs (comma separated)"
             />
             <input
               value={sideBUsers}
               onChange={(event) => setSideBUsers(event.target.value)}
-              className="w-full rounded-xl border border-black/10 px-3 py-2"
+              className="ui-input w-full"
               placeholder="Side B user IDs (comma separated)"
             />
             <button
               type="submit"
               disabled={saving || !selectedSessionId}
-              className="rounded-xl bg-[var(--app-primary)] px-4 py-2 font-semibold text-white disabled:opacity-60"
+              className="ui-button ui-button-primary disabled:opacity-60"
             >
               {saving ? "Saving..." : "Create matchup"}
             </button>
@@ -253,14 +253,14 @@ export function CourtManager() {
         </article>
       </section>
 
-      <section className="mt-6 rounded-3xl border border-black/5 bg-white p-6 shadow-sm">
+      <section className="mt-6 ui-section">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold">Matchups</h2>
+          <h2 className="ui-heading-section">Matchups</h2>
           <div className="flex items-center gap-2">
             {selectedSessionId ? (
               <Link
                 href={`/results?sessionId=${encodeURIComponent(selectedSessionId)}`}
-                className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                className="ui-button ui-button-neutral"
               >
                 View results
               </Link>
@@ -268,25 +268,25 @@ export function CourtManager() {
             <button
               type="button"
               onClick={() => void loadMatchups(selectedSessionId)}
-              className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+              className="ui-button ui-button-neutral"
             >
               Refresh
             </button>
           </div>
         </div>
 
-        {loading ? <p className="text-sm text-[var(--app-muted)]">Loading matchups...</p> : null}
-        {!loading && !matchups.length ? <p className="text-sm text-[var(--app-muted)]">No matchups yet.</p> : null}
+        {loading ? <p className="ui-text-sm ui-text-muted">Loading matchups...</p> : null}
+        {!loading && !matchups.length ? <p className="ui-text-sm ui-text-muted">No matchups yet.</p> : null}
 
         <div className="space-y-3">
           {matchups.map((matchup) => (
-            <article key={matchup.id} className="rounded-2xl border border-black/5 bg-[var(--app-bg)] px-4 py-3">
+            <article key={matchup.id} className="ui-card">
               <p className="font-semibold">
                 Round {matchup.roundNumber} · Slot {matchup.slotNumber} · {matchup.status}
               </p>
-              <p className="text-sm text-[var(--app-muted)]">A: {matchup.sideAUserIds.join(", ") || "n/a"}</p>
-              <p className="text-sm text-[var(--app-muted)]">B: {matchup.sideBUserIds.join(", ") || "n/a"}</p>
-              <p className="mt-1 text-sm text-[var(--app-muted)]">
+              <p className="ui-text-sm ui-text-muted">A: {matchup.sideAUserIds.join(", ") || "n/a"}</p>
+              <p className="ui-text-sm ui-text-muted">B: {matchup.sideBUserIds.join(", ") || "n/a"}</p>
+              <p className="mt-1 ui-text-sm ui-text-muted">
                 Latest score: {matchup.latestScore ? `${matchup.latestScore.sideAScore} - ${matchup.latestScore.sideBScore}` : "none"}
               </p>
 
@@ -295,7 +295,7 @@ export function CourtManager() {
                   <button
                     type="button"
                     onClick={() => void setStatus(matchup.id, "in_progress")}
-                    className="rounded-xl border border-black/10 bg-white px-3 py-1.5 text-sm font-semibold"
+                    className="ui-button ui-button-neutral"
                   >
                     Start matchup
                   </button>
@@ -312,9 +312,9 @@ export function CourtManager() {
                       [matchup.id]: { ...(prev[matchup.id] ?? { sideAScore: "0", sideBScore: "0" }), sideAScore: event.target.value },
                     }))
                   }
-                  className="w-20 rounded-xl border border-black/10 px-2 py-1"
+                  className="w-20 rounded-xl border border-[var(--app-border-soft)] px-2 py-1"
                 />
-                <span className="text-sm text-[var(--app-muted)]">-</span>
+                <span className="ui-text-sm ui-text-muted">-</span>
                 <input
                   type="number"
                   min={0}
@@ -326,13 +326,13 @@ export function CourtManager() {
                       [matchup.id]: { ...(prev[matchup.id] ?? { sideAScore: "0", sideBScore: "0" }), sideBScore: event.target.value },
                     }))
                   }
-                  className="w-20 rounded-xl border border-black/10 px-2 py-1"
+                  className="w-20 rounded-xl border border-[var(--app-border-soft)] px-2 py-1"
                 />
                 <button
                   type="button"
                   onClick={() => void submitScore(matchup.id)}
                   disabled={matchup.status === "finished"}
-                  className="rounded-xl bg-[var(--app-accent)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+                  className="ui-button ui-button-accent disabled:opacity-60"
                 >
                   {matchup.status === "finished" ? "Finalized" : "Submit score"}
                 </button>
@@ -342,7 +342,7 @@ export function CourtManager() {
         </div>
       </section>
 
-      {message ? <p className="mt-6 rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-[var(--app-muted)]">{message}</p> : null}
+      {message ? <p className="mt-6 ui-card ui-text-sm ui-text-muted">{message}</p> : null}
     </main>
   );
 }

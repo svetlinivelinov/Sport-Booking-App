@@ -7,11 +7,11 @@ export default function Home() {
     <div className="flex min-h-full flex-col">
       <PublicNav />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-16">
-        <p className="text-sm uppercase tracking-[0.2em] text-[var(--app-muted)]">Multi-sport and rebrand-ready</p>
+        <p className="text-sm uppercase tracking-[0.2em] ui-text-muted">Multi-sport and rebrand-ready</p>
         <h1 className="mt-4 max-w-3xl text-5xl font-bold tracking-tight">
           Organize sessions, track matchups, and keep standings in one place.
         </h1>
-        <p className="mt-6 max-w-2xl text-lg text-[var(--app-muted)]">
+        <p className="mt-6 max-w-2xl text-lg ui-text-muted">
           From football to padel and beyond, run your activities with shared scheduling, score flow, and role-based management.
         </p>
         <div className="mt-8 flex items-center gap-3">

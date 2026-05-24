@@ -18,12 +18,24 @@ function formatDate(value: string) {
 
 function badgeStyle(status: string) {
   if (status === "open") {
-    return { backgroundColor: "#e8f7ef", borderColor: "#9dd8b8", color: "#0c7a48" };
+    return {
+      backgroundColor: appTheme.colors.statusOpenBg,
+      borderColor: appTheme.colors.statusOpenBorder,
+      color: appTheme.colors.statusOpenText,
+    };
   }
   if (status === "finished") {
-    return { backgroundColor: "#f1f3f8", borderColor: "#d2d7e5", color: "#5c6b85" };
+    return {
+      backgroundColor: appTheme.colors.statusFinishedBg,
+      borderColor: appTheme.colors.statusFinishedBorder,
+      color: appTheme.colors.muted,
+    };
   }
-  return { backgroundColor: "#e9f0ff", borderColor: "#bdd1ff", color: appTheme.colors.primary };
+  return {
+    backgroundColor: appTheme.colors.statusDraftBg,
+    borderColor: appTheme.colors.statusDraftBorder,
+    color: appTheme.colors.primary,
+  };
 }
 
 export function DashboardScreen({ token }: DashboardScreenProps) {
@@ -171,73 +183,73 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    gap: 10,
-    paddingBottom: 8,
+    gap: appTheme.spacing.size10,
+    paddingBottom: appTheme.spacing.size8,
   },
   title: {
-    fontSize: 24,
+    fontSize: appTheme.typography.size24,
     color: appTheme.colors.foreground,
     fontFamily: mobileFonts.bold,
   },
   subtitle: {
     color: appTheme.colors.muted,
-    fontSize: 14,
+    fontSize: appTheme.typography.size14,
     fontFamily: mobileFonts.regular,
   },
   metricsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: appTheme.spacing.size8,
   },
   metricCardWide: {
     width: "100%",
-    gap: 6,
+    gap: appTheme.spacing.size6,
     borderWidth: 1,
-    borderColor: "#dbe2f0",
-    borderRadius: 12,
+    borderColor: appTheme.colors.borderSoft,
+    borderRadius: appTheme.radius.size12,
     padding: 12,
   },
   metricCard: {
     width: "48.5%",
-    gap: 4,
+    gap: appTheme.spacing.size4,
     borderWidth: 1,
-    borderColor: "#dbe2f0",
-    borderRadius: 12,
+    borderColor: appTheme.colors.borderSoft,
+    borderRadius: appTheme.radius.size12,
     padding: 12,
   },
   metricLabel: {
     color: appTheme.colors.muted,
-    fontSize: 12,
+    fontSize: appTheme.typography.size12,
     fontFamily: mobileFonts.regular,
   },
   metricValue: {
     color: appTheme.colors.foreground,
-    fontSize: 18,
+    fontSize: appTheme.typography.size18,
     fontFamily: mobileFonts.bold,
   },
   error: {
-    color: "#b42318",
-    fontSize: 13,
+    color: appTheme.colors.dangerText,
+    fontSize: appTheme.typography.size13,
     fontFamily: mobileFonts.regular,
   },
   sectionTitle: {
     marginTop: 4,
-    fontSize: 16,
+    fontSize: appTheme.typography.size16,
     color: appTheme.colors.foreground,
     fontFamily: mobileFonts.semiBold,
   },
   filterRow: {
     flexDirection: "row",
-    gap: 8,
-    paddingVertical: 4,
+    gap: appTheme.spacing.size8,
+    paddingVertical: appTheme.spacing.size4,
   },
   filterChip: {
     borderWidth: 1,
-    borderColor: "#dbe2f0",
-    borderRadius: 999,
-    backgroundColor: "#eef2fa",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    borderColor: appTheme.colors.borderSoft,
+    borderRadius: appTheme.radius.pill,
+    backgroundColor: appTheme.colors.surfaceMuted,
+    paddingHorizontal: appTheme.spacing.size12,
+    paddingVertical: appTheme.spacing.size7,
   },
   filterChipActive: {
     borderColor: appTheme.colors.primary,
@@ -245,55 +257,55 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: appTheme.colors.foreground,
-    fontSize: 12,
+    fontSize: appTheme.typography.size12,
     textTransform: "capitalize",
     fontFamily: mobileFonts.semiBold,
   },
   filterTextActive: {
-    color: "#ffffff",
+    color: appTheme.colors.onPrimary,
   },
   feedList: {
-    gap: 8,
+    gap: appTheme.spacing.size8,
   },
   feedItem: {
     borderWidth: 1,
-    borderColor: "#dbe2f0",
-    borderRadius: 12,
+    borderColor: appTheme.colors.borderSoft,
+    borderRadius: appTheme.radius.size12,
     padding: 12,
-    gap: 2,
+    gap: appTheme.spacing.size2,
     backgroundColor: appTheme.colors.surface,
   },
   feedTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 10,
+    gap: appTheme.spacing.size10,
   },
   feedTitle: {
     flex: 1,
     color: appTheme.colors.foreground,
-    fontSize: 14,
+    fontSize: appTheme.typography.size14,
     fontFamily: mobileFonts.semiBold,
   },
   feedMeta: {
     color: appTheme.colors.muted,
-    fontSize: 12,
+    fontSize: appTheme.typography.size12,
     fontFamily: mobileFonts.regular,
   },
   statusBadge: {
     borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    borderRadius: appTheme.radius.pill,
+    paddingHorizontal: appTheme.spacing.size8,
+    paddingVertical: appTheme.spacing.size3,
   },
   statusText: {
-    fontSize: 10,
+    fontSize: appTheme.typography.size10,
     textTransform: "uppercase",
     fontFamily: mobileFonts.semiBold,
   },
   empty: {
     color: appTheme.colors.muted,
-    fontSize: 13,
+    fontSize: appTheme.typography.size13,
     fontFamily: mobileFonts.regular,
   },
 });

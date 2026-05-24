@@ -16,8 +16,8 @@ const appLinks = [
 function linkClass(pathname: string, href: string) {
   const active = pathname === href;
   return active
-    ? "rounded-full bg-[var(--app-primary)] px-3 py-1.5 text-sm font-semibold text-white"
-    : "rounded-full px-3 py-1.5 text-sm font-medium text-[var(--app-muted)] hover:bg-black/5";
+    ? "ui-nav-pill ui-nav-pill-active"
+    : "ui-nav-pill ui-nav-pill-muted";
 }
 
 export function PublicNav() {
@@ -25,7 +25,7 @@ export function PublicNav() {
 
   return (
     <nav className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
-      <Link href="/" className="text-lg font-bold tracking-tight">
+      <Link href="/" className="ui-brand-title">
         Sport Booking
       </Link>
       <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ export function AppNav() {
 
   return (
     <nav className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-5">
-      <Link href="/dashboard" className="text-lg font-bold tracking-tight">
+      <Link href="/dashboard" className="ui-brand-title">
         Sport Booking
       </Link>
       <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export function AppNav() {
           type="button"
           onClick={handleLogout}
           disabled={busy}
-          className="rounded-full bg-[var(--app-danger)] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-60"
+          className="ui-nav-pill ui-nav-pill-danger disabled:opacity-60"
         >
           {busy ? "Signing out..." : "Sign out"}
         </button>
