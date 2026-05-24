@@ -9,6 +9,8 @@ interface SessionRow {
   startsAt: string;
   venueName: string | null;
   participantCount: number;
+  maxParticipants?: number;
+  isParticipant?: boolean;
 }
 
 interface SessionsResponse {
@@ -38,6 +40,7 @@ export function MySessionsManager() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [busySessionId, setBusySessionId] = useState<string | null>(null);
+  const [finalizingSessionId, setFinalizingSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,7 +59,19 @@ export function MySessionsManager() {
         return;
       }
 
-      setRows(payload.rows ?? []);
+      const sortedRows = [...(payload.rows ?? [])].sort((a, b) => {
+        const aIsDraft = a.status === "draft" ? 1 : 0;
+        const bIsDraft = b.status === "draft" ? 1 : 0;
+        if (aIsDraft !== bIsDraft) {
+          return bIsDraft - aIsDraft;
+        }
+
+        const aTime = new Date(a.startsAt).getTime();
+        const bTime = new Date(b.startsAt).getTime();
+        return bTime - aTime;
+      });
+
+      setRows(sortedRows);
       setTotalPages(Math.max(1, payload.totalPages ?? 1));
     } catch {
       setError("Unable to load your sessions.");
@@ -94,10 +109,36 @@ export function MySessionsManager() {
     }
   }
 
+  async function onFinalize(sessionId: string) {
+    setFinalizingSessionId(sessionId);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/sessions/${encodeURIComponent(sessionId)}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: "open" }),
+      });
+
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(payload.error ?? "Unable to finalize this session.");
+        return;
+      }
+
+      await loadMine();
+    } catch {
+      setError("Unable to finalize this session.");
+    } finally {
+      setFinalizingSessionId(null);
+    }
+  }
+
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
       <h1 className="ui-heading-page">My Sessions</h1>
-      <p className="mt-2 ui-text-sm ui-text-muted">Sessions you joined from events.</p>
+      <p className="mt-2 ui-text-sm ui-text-muted">Sessions you created or joined. Finalize drafts here.</p>
 
       <section className="mt-8 ui-section">
         {loading ? <p className="ui-text-sm ui-text-muted">Loading sessions...</p> : null}
@@ -118,9 +159,22 @@ export function MySessionsManager() {
               </div>
               <p className="ui-text-sm ui-text-muted">Starts: {formatDate(row.startsAt)}</p>
               <p className="ui-text-sm ui-text-muted">Venue: {row.venueName ?? "TBD"}</p>
-              <p className="ui-text-sm ui-text-muted">Participants: {row.participantCount ?? 0}</p>
+              <p className="ui-text-sm ui-text-muted">
+                Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
+              </p>
 
-              {row.status !== "finished" ? (
+              {row.status === "draft" ? (
+                <button
+                  type="button"
+                  onClick={() => void onFinalize(row.id)}
+                  disabled={finalizingSessionId === row.id}
+                  className="mt-3 ui-button ui-button-accent disabled:opacity-60"
+                >
+                  {finalizingSessionId === row.id ? "Finalizing..." : "Finalize"}
+                </button>
+              ) : null}
+
+              {row.status !== "finished" && row.isParticipant ? (
                 <button
                   type="button"
                   onClick={() => void onLeave(row.id)}

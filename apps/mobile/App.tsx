@@ -96,8 +96,6 @@ export default function App() {
           </Text>
         </View>
 
-        <View style={[styles.card, isCompactHeight && styles.cardCompact]}>{content}</View>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -125,6 +123,8 @@ export default function App() {
             );
           })}
         </ScrollView>
+
+        <View style={[styles.card, isCompactHeight && styles.cardCompact]}>{content}</View>
 
         <StatusBar style="light" />
       </View>
@@ -185,13 +185,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: appTheme.spacing.size8,
-    paddingTop: appTheme.spacing.size14,
-    paddingBottom: appTheme.spacing.size14,
+    paddingTop: appTheme.spacing.size2,
+    paddingBottom: appTheme.spacing.size10,
   },
   tabScroll: {
     flexGrow: 0,
     flexShrink: 0,
-    marginBottom: appTheme.spacing.size2,
+    marginBottom: appTheme.spacing.size8,
   },
   tab: {
     flexShrink: 0,

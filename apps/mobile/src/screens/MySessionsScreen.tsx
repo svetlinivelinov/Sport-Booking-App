@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { appTheme } from "@sport-booking/shared";
-import { getSessions, leaveSession, SessionSummary } from "../lib/authApi";
+import { getSessions, leaveSession, SessionSummary, updateSessionStatus } from "../lib/authApi";
 import { mobileFonts } from "../ui/fonts";
 
 interface MySessionsScreenProps {
@@ -75,6 +75,24 @@ export function MySessionsScreen({ token, refreshKey, onSessionChange }: MySessi
     }
   }
 
+  async function onFinalize(row: SessionSummary) {
+    if (!token) {
+      return;
+    }
+
+    setBusySessionId(row.id);
+    setError(null);
+    try {
+      await updateSessionStatus(token, row.id, "open");
+      onSessionChange?.();
+      await loadMine();
+    } catch (finalizeError) {
+      setError(finalizeError instanceof Error ? finalizeError.message : "Unable to finalize this session.");
+    } finally {
+      setBusySessionId(null);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Sessions</Text>
@@ -92,7 +110,16 @@ export function MySessionsScreen({ token, refreshKey, onSessionChange }: MySessi
             <Text style={styles.itemMeta}>
               Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
             </Text>
-            {row.status !== "finished" ? (
+            {row.status === "draft" ? (
+              <TouchableOpacity
+                style={styles.primaryActionButton}
+                onPress={() => void onFinalize(row)}
+                disabled={busySessionId === row.id}
+              >
+                <Text style={styles.primaryActionButtonText}>{busySessionId === row.id ? "Finalizing..." : "Finalize"}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {row.status !== "finished" && row.isParticipant ? (
               <TouchableOpacity
                 style={styles.secondaryActionButton}
                 onPress={() => void onLeave(row)}
@@ -180,6 +207,19 @@ const styles = StyleSheet.create({
     backgroundColor: appTheme.colors.onPrimary,
     paddingHorizontal: appTheme.spacing.size12,
     paddingVertical: appTheme.spacing.size7,
+  },
+  primaryActionButton: {
+    alignSelf: "flex-start",
+    marginTop: 4,
+    borderRadius: appTheme.radius.size10,
+    backgroundColor: appTheme.colors.accent,
+    paddingHorizontal: appTheme.spacing.size12,
+    paddingVertical: appTheme.spacing.size7,
+  },
+  primaryActionButtonText: {
+    color: appTheme.colors.onPrimary,
+    fontSize: appTheme.typography.size12,
+    fontFamily: mobileFonts.semiBold,
   },
   secondaryActionButtonText: {
     color: appTheme.colors.foreground,

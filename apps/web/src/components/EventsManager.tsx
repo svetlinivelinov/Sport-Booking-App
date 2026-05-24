@@ -35,11 +35,17 @@ interface GroupRow {
   isMember: boolean;
 }
 
+interface SportOption {
+  id: string;
+  name: string;
+}
+
 export function EventsManager() {
   const [title, setTitle] = useState("");
   const [venueName, setVenueName] = useState("");
   const [startsAtLocal, setStartsAtLocal] = useState(getDefaultStartsAtLocal);
   const [groups, setGroups] = useState<GroupRow[]>([]);
+  const [sports, setSports] = useState<SportOption[]>([]);
   const [selectedSportId, setSelectedSportId] = useState("");
   const [selectedGroupId, setSelectedGroupId] = useState("");
   const [sessions, setSessions] = useState<SessionRow[]>([]);
@@ -106,10 +112,30 @@ export function EventsManager() {
       if (memberGroups.length) {
         const firstGroup = memberGroups[0];
         setSelectedGroupId((prev) => prev || firstGroup.id);
-        setSelectedSportId((prev) => prev || firstGroup.sportId);
       }
     } catch {
       setMessage("Unable to load groups");
+    }
+  }
+
+  async function loadSports() {
+    try {
+      const res = await fetch("/api/sports", { cache: "no-store" });
+      const data = (await res.json()) as { rows?: SportOption[]; error?: string };
+
+      if (!res.ok) {
+        setMessage(data.error ?? "Unable to load sports");
+        return;
+      }
+
+      const nextSports = data.rows ?? [];
+      setSports(nextSports);
+
+      if (nextSports.length) {
+        setSelectedSportId((prev) => prev || nextSports[0].id);
+      }
+    } catch {
+      setMessage("Unable to load sports");
     }
   }
 
@@ -117,7 +143,30 @@ export function EventsManager() {
     void loadSessions();
     void loadDiscoverSessions();
     void loadGroups();
+    void loadSports();
   }, []);
+
+  useEffect(() => {
+    if (!selectedSportId || selectedGroupId) {
+      return;
+    }
+
+    const nextGroup = groups.find((row) => row.sportId === selectedSportId);
+    if (nextGroup) {
+      setSelectedGroupId(nextGroup.id);
+    }
+  }, [groups, selectedGroupId, selectedSportId]);
+
+  useEffect(() => {
+    if (!selectedGroupId) {
+      return;
+    }
+
+    const group = groups.find((row) => row.id === selectedGroupId);
+    if (group && group.sportId !== selectedSportId) {
+      setSelectedSportId(group.sportId);
+    }
+  }, [groups, selectedGroupId, selectedSportId]);
 
   async function onCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -143,8 +192,10 @@ export function EventsManager() {
         return;
       }
 
-      setSessions((prev) => [data.session as SessionRow, ...prev]);
-      void loadDiscoverSessions();
+      await loadGroups();
+      setSelectedGroupId(data.session.groupId);
+      await loadSessions();
+      await loadDiscoverSessions();
       setTitle("");
       setVenueName("");
       setStartsAtLocal(getDefaultStartsAtLocal());
@@ -160,16 +211,21 @@ export function EventsManager() {
     setMessage(null);
 
     try {
-      const res = await fetch(`/api/sessions/${id}/finalize`, { method: "POST" });
-      const data = (await res.json()) as { session?: SessionRow; error?: string };
+      const res = await fetch(`/api/sessions/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: "open" }),
+      });
 
+      const data = (await res.json()) as { session?: SessionRow; error?: string };
       if (!res.ok || !data.session) {
         setMessage(data.error ?? "Failed to finalize session");
         return;
       }
 
-      setSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
-      setDiscoverSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
+      await loadSessions();
+      await loadDiscoverSessions();
       setMessage("Session finalized");
     } catch {
       setMessage("Failed to finalize session");
@@ -212,8 +268,8 @@ export function EventsManager() {
         return;
       }
 
-      setSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
-      setDiscoverSessions((prev) => prev.map((row) => (row.id === id ? data.session! : row)));
+      await loadSessions();
+      await loadDiscoverSessions();
       cancelEditing();
       setMessage("Session updated");
     } catch {
@@ -364,16 +420,6 @@ export function EventsManager() {
     [editStartsAtLocal, editTitle, editVenueName, editingId, sessions, updating],
   );
 
-  const sports = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const group of groups) {
-      if (!map.has(group.sportId)) {
-        map.set(group.sportId, group.sportName);
-      }
-    }
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [groups]);
-
   const filteredGroups = useMemo(
     () => (selectedSportId ? groups.filter((row) => row.sportId === selectedSportId) : groups),
     [groups, selectedSportId],
@@ -457,15 +503,19 @@ export function EventsManager() {
                   setSelectedSportId(selectedGroup.sportId);
                 }
               }}
-              required
             >
-              <option value="">Select group</option>
+              <option value="">Auto-select from sport (optional)</option>
               {filteredGroups.map((group) => (
                 <option key={group.id} value={group.id}>
                   {group.name}
                 </option>
               ))}
             </select>
+            {!filteredGroups.length ? (
+              <span className="mt-1 block ui-text-xs ui-text-muted">
+                No group for this sport yet. Saving will auto-create one and select it.
+              </span>
+            ) : null}
           </label>
 
           <input

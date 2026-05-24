@@ -188,6 +188,28 @@ export async function leaveSession(token: string, sessionId: string): Promise<vo
   }
 }
 
+export async function updateSessionStatus(
+  token: string,
+  sessionId: string,
+  status: "draft" | "open" | "finished",
+): Promise<SessionSummary> {
+  const response = await fetch(`${apiBaseUrl}/api/sessions/${sessionId}/status`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  const payload = (await response.json()) as { session?: SessionSummary; error?: string };
+  if (!response.ok || !payload.session) {
+    throw new Error(payload.error || "Unable to update session status");
+  }
+
+  return payload.session;
+}
+
 export async function getGroups(token: string): Promise<GroupsResponse> {
   const response = await fetch(`${apiBaseUrl}/api/groups`, {
     method: "GET",

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { appTheme } from "@sport-booking/shared";
-import { getSessions, joinSession, leaveSession, SessionSummary } from "../lib/authApi";
+import { getSessions, joinSession, leaveSession, SessionSummary, updateSessionStatus } from "../lib/authApi";
 import { mobileFonts } from "../ui/fonts";
 
 interface EventsScreenProps {
@@ -43,7 +43,7 @@ export function EventsScreen({ token, refreshKey, onSessionChange }: EventsScree
       const response = await getSessions(token, {
         status: filter === "open" ? "open" : undefined,
         participating: filter === "joined",
-        mine: filter === "mine",
+        my: filter === "mine",
         page,
         pageSize,
       });
@@ -110,6 +110,24 @@ export function EventsScreen({ token, refreshKey, onSessionChange }: EventsScree
     }
   }
 
+  async function onFinalize(row: SessionSummary) {
+    if (!token) {
+      return;
+    }
+
+    setBusySessionId(row.id);
+    setError(null);
+    try {
+      await updateSessionStatus(token, row.id, "open");
+      onSessionChange?.();
+      await loadEvents();
+    } catch (finalizeError) {
+      setError(finalizeError instanceof Error ? finalizeError.message : "Unable to finalize session.");
+    } finally {
+      setBusySessionId(null);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Events</Text>
@@ -148,6 +166,15 @@ export function EventsScreen({ token, refreshKey, onSessionChange }: EventsScree
             <Text style={styles.itemMeta}>
               Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
             </Text>
+            {row.status === "draft" ? (
+              <TouchableOpacity
+                style={styles.primaryActionButton}
+                onPress={() => void onFinalize(row)}
+                disabled={busySessionId === row.id}
+              >
+                <Text style={styles.primaryActionButtonText}>{busySessionId === row.id ? "Finalizing..." : "Finalize"}</Text>
+              </TouchableOpacity>
+            ) : null}
             {row.status === "open" ? (
               row.isParticipant ? (
                 <TouchableOpacity

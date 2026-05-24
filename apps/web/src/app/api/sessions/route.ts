@@ -203,6 +203,7 @@ export async function POST(request: Request) {
 
   let resolvedGroupId: string | null = null;
   let resolvedSportId: string | null = null;
+  const requestedSportId = body.sportId?.trim() || null;
 
   if (body.groupId) {
     const group = await db.query.groups.findFirst({ where: eq(groups.id, body.groupId) });
@@ -219,19 +220,48 @@ export async function POST(request: Request) {
     resolvedSportId = group.sportId;
   }
 
+  if (!resolvedGroupId && requestedSportId) {
+    const requestedSport = await db.query.sports.findFirst({ where: eq(sports.id, requestedSportId) });
+    if (!requestedSport) {
+      return withCors(request, NextResponse.json({ error: "sportId not found" }, { status: 400 }));
+    }
+
+    const ownedMatchingGroup = await db.query.groups.findFirst({
+      where: and(eq(groups.ownerUserId, sessionUser.sub), eq(groups.sportId, requestedSportId)),
+    });
+    if (ownedMatchingGroup) {
+      resolvedGroupId = ownedMatchingGroup.id;
+      resolvedSportId = ownedMatchingGroup.sportId;
+    }
+
+    if (!resolvedGroupId) {
+      const matchingGroup = await db.query.groups.findFirst({ where: eq(groups.sportId, requestedSportId) });
+      if (matchingGroup) {
+        resolvedGroupId = matchingGroup.id;
+        resolvedSportId = matchingGroup.sportId;
+      }
+    }
+
+    if (!resolvedGroupId) {
+      const autoGroupId = randomUUID();
+      await db.insert(groups).values({
+        id: autoGroupId,
+        sportId: requestedSportId,
+        ownerUserId: sessionUser.sub,
+        name: `My ${requestedSport.name} Group`,
+        description: "Auto-created group for selected sport",
+      });
+
+      resolvedGroupId = autoGroupId;
+      resolvedSportId = requestedSportId;
+    }
+  }
+
   if (!resolvedGroupId) {
     const ownedGroup = await db.query.groups.findFirst({ where: eq(groups.ownerUserId, sessionUser.sub) });
     if (ownedGroup) {
       resolvedGroupId = ownedGroup.id;
       resolvedSportId = ownedGroup.sportId;
-    }
-  }
-
-  if (!resolvedGroupId && body.sportId) {
-    const matchingGroup = await db.query.groups.findFirst({ where: eq(groups.sportId, body.sportId) });
-    if (matchingGroup) {
-      resolvedGroupId = matchingGroup.id;
-      resolvedSportId = matchingGroup.sportId;
     }
   }
 
