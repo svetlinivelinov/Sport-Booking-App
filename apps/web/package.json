@@ -27,6 +27,7 @@
     "tailwindcss": "^4"
   },
   "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.13.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
