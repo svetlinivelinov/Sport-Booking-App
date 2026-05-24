@@ -20,15 +20,28 @@ interface SessionRow {
   startsAt: string;
   venueName: string | null;
   groupId: string;
+  sportId?: string;
   participantCount?: number;
+  maxParticipants?: number;
   isParticipant?: boolean;
   myParticipantStatus?: string | null;
+}
+
+interface GroupRow {
+  id: string;
+  name: string;
+  sportId: string;
+  sportName: string;
+  isMember: boolean;
 }
 
 export function EventsManager() {
   const [title, setTitle] = useState("");
   const [venueName, setVenueName] = useState("");
   const [startsAtLocal, setStartsAtLocal] = useState(getDefaultStartsAtLocal);
+  const [groups, setGroups] = useState<GroupRow[]>([]);
+  const [selectedSportId, setSelectedSportId] = useState("");
+  const [selectedGroupId, setSelectedGroupId] = useState("");
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [discoverSessions, setDiscoverSessions] = useState<SessionRow[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -77,9 +90,33 @@ export function EventsManager() {
     }
   }
 
+  async function loadGroups() {
+    try {
+      const res = await fetch("/api/groups", { cache: "no-store" });
+      const data = (await res.json()) as { rows?: GroupRow[]; error?: string };
+
+      if (!res.ok) {
+        setMessage(data.error ?? "Unable to load groups");
+        return;
+      }
+
+      const memberGroups = (data.rows ?? []).filter((row) => row.isMember);
+      setGroups(memberGroups);
+
+      if (memberGroups.length) {
+        const firstGroup = memberGroups[0];
+        setSelectedGroupId((prev) => prev || firstGroup.id);
+        setSelectedSportId((prev) => prev || firstGroup.sportId);
+      }
+    } catch {
+      setMessage("Unable to load groups");
+    }
+  }
+
   useEffect(() => {
     void loadSessions();
     void loadDiscoverSessions();
+    void loadGroups();
   }, []);
 
   async function onCreate(event: FormEvent<HTMLFormElement>) {
@@ -91,7 +128,13 @@ export function EventsManager() {
       const res = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, venueName, startsAt: new Date(startsAtLocal).toISOString() }),
+        body: JSON.stringify({
+          title,
+          venueName,
+          startsAt: new Date(startsAtLocal).toISOString(),
+          groupId: selectedGroupId || undefined,
+          sportId: selectedSportId || undefined,
+        }),
       });
 
       const data = (await res.json()) as { session?: SessionRow; error?: string };
@@ -252,6 +295,9 @@ export function EventsManager() {
               <p className="ui-text-sm ui-text-muted">
                 {new Date(row.startsAt).toLocaleString()} · {row.venueName ?? "TBA"} · {row.status}
               </p>
+              <p className="mt-1 ui-text-xs ui-text-muted">
+                Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -318,6 +364,21 @@ export function EventsManager() {
     [editStartsAtLocal, editTitle, editVenueName, editingId, sessions, updating],
   );
 
+  const sports = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const group of groups) {
+      if (!map.has(group.sportId)) {
+        map.set(group.sportId, group.sportName);
+      }
+    }
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [groups]);
+
+  const filteredGroups = useMemo(
+    () => (selectedSportId ? groups.filter((row) => row.sportId === selectedSportId) : groups),
+    [groups, selectedSportId],
+  );
+
   const discoverItems = useMemo(
     () =>
       discoverSessions.map((row) => (
@@ -326,7 +387,9 @@ export function EventsManager() {
           <p className="ui-text-sm ui-text-muted">
             {new Date(row.startsAt).toLocaleString()} · {row.venueName ?? "TBA"} · {row.status}
           </p>
-          <p className="mt-1 ui-text-xs ui-text-muted">Participants: {row.participantCount ?? 0}</p>
+          <p className="mt-1 ui-text-xs ui-text-muted">
+            Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
+          </p>
           <div className="mt-2">
             {row.isParticipant ? (
               <button
@@ -359,6 +422,52 @@ export function EventsManager() {
         <h1 className="ui-metric-value tracking-tight">Create session</h1>
         <p className="mt-2 ui-text-sm ui-text-muted">Create a draft, then finalize it to make it active.</p>
         <form className="mt-5 space-y-3" onSubmit={onCreate}>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium ui-text-muted">Sport</span>
+            <select
+              className="ui-input w-full"
+              value={selectedSportId}
+              onChange={(event) => {
+                const nextSportId = event.target.value;
+                setSelectedSportId(nextSportId);
+                const nextGroup = groups.find((row) => row.sportId === nextSportId);
+                setSelectedGroupId(nextGroup?.id ?? "");
+              }}
+              required
+            >
+              <option value="">Select sport</option>
+              {sports.map((sport) => (
+                <option key={sport.id} value={sport.id}>
+                  {sport.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium ui-text-muted">Group</span>
+            <select
+              className="ui-input w-full"
+              value={selectedGroupId}
+              onChange={(event) => {
+                const nextGroupId = event.target.value;
+                setSelectedGroupId(nextGroupId);
+                const selectedGroup = groups.find((row) => row.id === nextGroupId);
+                if (selectedGroup) {
+                  setSelectedSportId(selectedGroup.sportId);
+                }
+              }}
+              required
+            >
+              <option value="">Select group</option>
+              {filteredGroups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <input
             className="ui-input w-full"
             placeholder="Session title"

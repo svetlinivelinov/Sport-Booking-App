@@ -145,7 +145,9 @@ export function EventsScreen({ token, refreshKey, onSessionChange }: EventsScree
             <Text style={styles.itemMeta}>Status: {row.status}</Text>
             <Text style={styles.itemMeta}>Starts: {formatDate(row.startsAt)}</Text>
             <Text style={styles.itemMeta}>Venue: {row.venueName || "TBD"}</Text>
-            <Text style={styles.itemMeta}>Participants: {row.participantCount ?? 0}</Text>
+            <Text style={styles.itemMeta}>
+              Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
+            </Text>
             {row.status === "open" ? (
               row.isParticipant ? (
                 <TouchableOpacity

@@ -70,3 +70,68 @@
 1. Object storage file upload/download flow (for example Cloudflare R2).
 2. Automated tests and GitHub Actions execution.
 3. Automated backup workflow for DB/storage snapshots.
+
+## Technical Spec Addendum: Sport-Driven Participant Capacity
+
+### Goal
+
+Replace hardcoded participant assumptions with sport-configured capacity rules that apply consistently across DB, API, web, and mobile.
+
+### Scope
+
+1. Define sport-level default participant capacity.
+2. Snapshot capacity at session creation time.
+3. Enforce capacity in join flow with concurrency safety.
+4. Expose capacity fields to clients and remove UI hardcoding.
+5. Align seed behavior with sport config.
+
+### Proposed Data Model
+
+1. Keep sport as default source of truth:
+	- Option A: derive from existing `teamSize` (for two-side sports, max participants = teamSize * 2).
+	- Option B: explicit `rulesConfig.maxParticipants` for sport-specific override.
+2. Add `sessions.maxParticipants` as a required snapshot field.
+3. Backfill existing sessions during migration using sport defaults and controlled fallback.
+
+### API and Service Behavior
+
+1. On session creation:
+	- Resolve default capacity from selected sport.
+	- Persist resolved value to `sessions.maxParticipants`.
+2. On join session:
+	- Count active participants.
+	- Reject with `409` when full.
+	- Execute check and insert in a transaction to prevent race overbooking.
+3. On session list/detail responses:
+	- Return `participantCount`, `maxParticipants`, `remainingSlots`, and `isFull`.
+
+### UI Behavior (Web and Mobile)
+
+1. Show `Participants: X / Y` using API data.
+2. Disable or hide join action when `isFull`.
+3. Show a clear full-capacity reason when join is blocked.
+4. Remove any hardcoded participant limits from components.
+
+### Seed and Test Updates
+
+1. Seed generator should derive participants-per-session from sport config, not a fixed number.
+2. Add coverage for at least:
+	- Padel capacity rule (4)
+	- Tennis capacity rule (2)
+	- Football capacity rule (8)
+3. Add concurrent join scenario validating overbooking does not occur.
+
+### Rollout Sequence
+
+1. Ship migration adding `sessions.maxParticipants` and backfill.
+2. Ship API enforcement and response shape updates.
+3. Ship web and mobile UI updates consuming new fields.
+4. Run large-seed validation and smoke tests.
+
+### Acceptance Criteria
+
+1. Participant limits are no longer hardcoded in UI or seed script.
+2. Join requests cannot exceed session capacity under concurrent load.
+3. Session capacity reflects sport configuration at creation time.
+4. Existing sessions remain valid after migration.
+5. Web and mobile both render the same participant-capacity behavior.

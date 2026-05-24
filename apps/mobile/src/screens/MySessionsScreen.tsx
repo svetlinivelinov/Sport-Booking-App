@@ -37,7 +37,7 @@ export function MySessionsScreen({ token, refreshKey, onSessionChange }: MySessi
     setIsLoading(true);
     setError(null);
     try {
-      const response = await getSessions(token, { participating: true, page, pageSize });
+      const response = await getSessions(token, { my: true, page, pageSize });
 
       if (page > 1 && response.rows.length === 0) {
         setPage((prev) => Math.max(1, prev - 1));
@@ -78,7 +78,7 @@ export function MySessionsScreen({ token, refreshKey, onSessionChange }: MySessi
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Sessions</Text>
-      <Text style={styles.subtitle}>Sessions you joined.</Text>
+      <Text style={styles.subtitle}>Sessions you created or joined.</Text>
 
       {isLoading ? <ActivityIndicator color={appTheme.colors.primary} /> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -89,7 +89,9 @@ export function MySessionsScreen({ token, refreshKey, onSessionChange }: MySessi
             <Text style={styles.itemTitle}>{row.title}</Text>
             <Text style={styles.itemMeta}>Status: {row.status}</Text>
             <Text style={styles.itemMeta}>Starts: {formatDate(row.startsAt)}</Text>
-            <Text style={styles.itemMeta}>Participants: {row.participantCount ?? 0}</Text>
+            <Text style={styles.itemMeta}>
+              Participants: {row.participantCount ?? 0}/{row.maxParticipants ?? "-"}
+            </Text>
             {row.status !== "finished" ? (
               <TouchableOpacity
                 style={styles.secondaryActionButton}

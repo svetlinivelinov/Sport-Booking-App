@@ -1,10 +1,10 @@
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { corsPreflight, withCors } from "@/app/api/auth/cors";
 import { getSessionUser } from "@/auth/session";
 import { db } from "@/db/client";
-import { sessionParticipants, sessions } from "@/db/schema";
+import { sessionParticipants, sessions, sports } from "@/db/schema";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -32,6 +32,40 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (existing) {
     return withCors(request, NextResponse.json({ ok: true, alreadyParticipant: true }));
+  }
+
+  const sport = await db.query.sports.findFirst({ where: eq(sports.id, sessionRow.sportId) });
+  if (!sport) {
+    return withCors(request, NextResponse.json({ error: "Session sport not found" }, { status: 409 }));
+  }
+
+  const configuredMax =
+    sport.rulesConfig && typeof sport.rulesConfig === "object" && "maxParticipants" in sport.rulesConfig
+      ? Number((sport.rulesConfig as Record<string, unknown>).maxParticipants)
+      : Number.NaN;
+
+  const maxParticipants =
+    Number.isFinite(configuredMax) && configuredMax > 0
+      ? Math.floor(configuredMax)
+      : Math.max(2, (sport.teamSize ?? 2) * 2);
+
+  const [{ participantCount }] = await db
+    .select({ participantCount: count() })
+    .from(sessionParticipants)
+    .where(eq(sessionParticipants.sessionId, id));
+
+  if (participantCount >= maxParticipants) {
+    return withCors(
+      request,
+      NextResponse.json(
+        {
+          error: "Session is full",
+          participantCount,
+          maxParticipants,
+        },
+        { status: 409 },
+      ),
+    );
   }
 
   await db.insert(sessionParticipants).values({

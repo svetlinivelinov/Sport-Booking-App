@@ -15,6 +15,7 @@ export interface SessionSummary {
   venueName: string | null;
   groupId: string;
   participantCount?: number;
+  maxParticipants?: number;
   isParticipant?: boolean;
   myParticipantStatus?: string | null;
 }
@@ -119,9 +120,12 @@ export async function getMyUser(token: string): Promise<AuthenticatedUser | null
 
 export async function getSessions(
   token: string,
-  params: { mine?: boolean; participating?: boolean; status?: string; page?: number; pageSize?: number } = {},
+  params: { my?: boolean; mine?: boolean; participating?: boolean; status?: string; page?: number; pageSize?: number } = {},
 ): Promise<SessionsResponse> {
   const searchParams = new URLSearchParams();
+  if (params.my) {
+    searchParams.set("my", "1");
+  }
   if (params.mine) {
     searchParams.set("mine", "1");
   }

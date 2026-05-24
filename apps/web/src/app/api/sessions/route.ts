@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { corsPreflight, withCors } from "@/app/api/auth/cors";
@@ -28,9 +28,10 @@ export async function GET(request: Request) {
   const status = searchParams.get("status")?.trim();
   const mine = searchParams.get("mine") === "1";
   const participating = searchParams.get("participating") === "1";
+  const my = searchParams.get("my") === "1";
 
   let participatingIds: string[] | null = null;
-  if (participating) {
+  if (participating || my) {
     const participantRows = await db
       .select({ sessionId: sessionParticipants.sessionId })
       .from(sessionParticipants)
@@ -38,34 +39,47 @@ export async function GET(request: Request) {
     participatingIds = participantRows.map((row) => row.sessionId);
   }
 
-  let whereClause: ReturnType<typeof eq> | ReturnType<typeof and> | undefined;
+  let whereClause: ReturnType<typeof eq> | ReturnType<typeof and> | ReturnType<typeof or> | undefined;
   const filters: Array<ReturnType<typeof eq> | ReturnType<typeof inArray>> = [];
-  if (status) {
-    filters.push(eq(sessions.status, status));
-  }
-  if (mine) {
-    filters.push(eq(sessions.createdByUserId, sessionUser.sub));
-  }
-  if (participating) {
-    if (!participatingIds?.length) {
-      return withCors(
-        request,
-        NextResponse.json({
-          page,
-          pageSize,
-          total: 0,
-          totalPages: 1,
-          rows: [],
-        }),
-      );
-    }
-    filters.push(inArray(sessions.id, participatingIds));
-  }
+  if (my) {
+    const mineFilter = eq(sessions.createdByUserId, sessionUser.sub);
+    const myFilter = participatingIds?.length
+      ? or(mineFilter, inArray(sessions.id, participatingIds))
+      : mineFilter;
 
-  if (filters.length === 1) {
-    whereClause = filters[0];
-  } else if (filters.length > 1) {
-    whereClause = and(...filters);
+    if (status) {
+      whereClause = and(eq(sessions.status, status), myFilter);
+    } else {
+      whereClause = myFilter;
+    }
+  } else {
+    if (status) {
+      filters.push(eq(sessions.status, status));
+    }
+    if (mine) {
+      filters.push(eq(sessions.createdByUserId, sessionUser.sub));
+    }
+    if (participating) {
+      if (!participatingIds?.length) {
+        return withCors(
+          request,
+          NextResponse.json({
+            page,
+            pageSize,
+            total: 0,
+            totalPages: 1,
+            rows: [],
+          }),
+        );
+      }
+      filters.push(inArray(sessions.id, participatingIds));
+    }
+
+    if (filters.length === 1) {
+      whereClause = filters[0];
+    } else if (filters.length > 1) {
+      whereClause = and(...filters);
+    }
   }
 
   const [{ total }] = await db
@@ -81,8 +95,12 @@ export async function GET(request: Request) {
       startsAt: sessions.startsAt,
       venueName: sessions.venueName,
       groupId: sessions.groupId,
+      sportId: sessions.sportId,
+      sportTeamSize: sports.teamSize,
+      sportRulesConfig: sports.rulesConfig,
     })
     .from(sessions)
+    .innerJoin(sports, eq(sports.id, sessions.sportId))
     .where(whereClause)
     .orderBy(desc(sessions.startsAt))
     .limit(pageSize)
@@ -114,12 +132,30 @@ export async function GET(request: Request) {
     }
   }
 
-  const enrichedRows = rows.map((row) => ({
-    ...row,
-    participantCount: participantCountBySession.get(row.id) ?? 0,
-    isParticipant: myParticipationBySession.has(row.id),
-    myParticipantStatus: myParticipationBySession.get(row.id) ?? null,
-  }));
+  const enrichedRows = rows.map((row) => {
+    const ruleMax =
+      row.sportRulesConfig && typeof row.sportRulesConfig === "object" && "maxParticipants" in row.sportRulesConfig
+        ? Number((row.sportRulesConfig as Record<string, unknown>).maxParticipants)
+        : Number.NaN;
+
+    const derivedMax = Number.isFinite(ruleMax) && ruleMax > 0
+      ? Math.floor(ruleMax)
+      : Math.max(2, (row.sportTeamSize ?? 2) * 2);
+
+    return {
+      id: row.id,
+      title: row.title,
+      status: row.status,
+      startsAt: row.startsAt,
+      venueName: row.venueName,
+      groupId: row.groupId,
+      sportId: row.sportId,
+      participantCount: participantCountBySession.get(row.id) ?? 0,
+      maxParticipants: derivedMax,
+      isParticipant: myParticipationBySession.has(row.id),
+      myParticipantStatus: myParticipationBySession.get(row.id) ?? null,
+    };
+  });
 
   return withCors(
     request,

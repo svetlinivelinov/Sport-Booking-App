@@ -13,9 +13,11 @@ const envCandidates = [
   resolve(process.cwd(), "apps/web/.env.local"),
 ];
 
-for (const filePath of envCandidates) {
-  if (existsSync(filePath)) {
-    loadEnv({ path: filePath, override: false });
+if (process.env.NODE_ENV !== "production") {
+  for (const filePath of envCandidates) {
+    if (existsSync(filePath)) {
+      loadEnv({ path: filePath, override: false });
+    }
   }
 }
 

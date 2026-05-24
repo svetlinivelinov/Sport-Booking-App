@@ -46,7 +46,7 @@ export function MySessionsManager() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/sessions?participating=1&page=${page}&pageSize=10`, { cache: "no-store" });
+      const response = await fetch(`/api/sessions?my=1&page=${page}&pageSize=10`, { cache: "no-store" });
       const payload = (await response.json()) as SessionsResponse;
 
       if (!response.ok) {

@@ -2,6 +2,20 @@
 
 This document defines the minimum steps to complete the final plan item: paging, seed validation, and deployment.
 
+## Pre-Netlify TODO (Must Pass)
+
+- [ ] Set Netlify env vars for `apps/web`: `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`.
+- [ ] Run production DB migrations against Neon before first production traffic.
+- [ ] Confirm Netlify web settings:
+   - Base directory: `apps/web`
+   - Build command: `npm run build`
+   - Publish directory: leave empty for Next.js runtime
+- [ ] Deploy web and verify:
+   - `GET /api/health`
+   - login works
+   - `GET /api/sessions?page=1&pageSize=20` with auth token works
+- [ ] (Optional mobile site) Set `EXPO_PUBLIC_API_BASE_URL` to deployed web URL and redeploy mobile export.
+
 ## Environment Variables
 
 ### apps/web
