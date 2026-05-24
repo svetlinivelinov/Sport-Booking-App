@@ -75,3 +75,26 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   return NextResponse.json({ session: updated });
 }
+
+export async function DELETE(_: Request, context: RouteContext) {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await context.params;
+  const sessionRow = await db.query.sessions.findFirst({ where: eq(sessions.id, id) });
+
+  if (!sessionRow) {
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+  }
+
+  const canDelete = sessionUser.role === "admin" || sessionRow.createdByUserId === sessionUser.sub;
+  if (!canDelete) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await db.delete(sessions).where(eq(sessions.id, id));
+
+  return NextResponse.json({ ok: true });
+}

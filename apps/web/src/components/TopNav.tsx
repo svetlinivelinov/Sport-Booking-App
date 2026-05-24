@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const appLinks = [
   { href: "/dashboard", label: "Upcoming" },
   { href: "/groups", label: "Groups" },
   { href: "/events", label: "Events" },
-  { href: "/court", label: "Court" },
+  { href: "/my-sessions", label: "My Sessions" },
   { href: "/results", label: "Results" },
   { href: "/profile", label: "Profile" },
 ];
@@ -44,6 +44,37 @@ export function AppNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRole() {
+      try {
+        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        if (!response.ok) {
+          if (!cancelled) {
+            setIsAdmin(false);
+          }
+          return;
+        }
+
+        const payload = (await response.json()) as { user?: { role?: "user" | "admin" } | null };
+        if (!cancelled) {
+          setIsAdmin(payload.user?.role === "admin");
+        }
+      } catch {
+        if (!cancelled) {
+          setIsAdmin(false);
+        }
+      }
+    }
+
+    void loadRole();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleLogout() {
     setBusy(true);
@@ -63,6 +94,11 @@ export function AppNav() {
             {link.label}
           </Link>
         ))}
+        {isAdmin ? (
+          <Link href="/admin" className={linkClass(pathname, "/admin")}>
+            Admin
+          </Link>
+        ) : null}
         <button
           type="button"
           onClick={handleLogout}

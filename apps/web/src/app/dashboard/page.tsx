@@ -133,7 +133,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <Link href="/events" className="ui-button ui-button-primary">
             Create session
           </Link>
-          <Link href={mineHref} className="ui-button ui-button-neutral bg-[var(--app-bg)]">
+          <Link href="/my-sessions" className="ui-button ui-button-neutral bg-[var(--app-bg)]">
             My sessions
           </Link>
           <Link href={openHref} className="ui-button ui-button-neutral bg-[var(--app-bg)]">
