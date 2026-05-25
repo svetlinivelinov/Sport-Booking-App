@@ -133,6 +133,7 @@ If you want the Expo web build hosted on Netlify as a separate frontend:
 1. Create a second Netlify site connected to this same repository and `main` branch.
 2. Build settings:
    - Base directory: `apps/mobile`
+   - Netlify config path: `apps/mobile/netlify.toml`
    - Build command: `npm run export:web`
    - Publish directory: `apps/mobile/dist`
 3. Set `EXPO_PUBLIC_API_BASE_URL` to your deployed Next.js URL.
@@ -146,6 +147,7 @@ Static hosting note:
 Mobile site checklist:
 
 - [ ] Netlify mobile site created
+- [ ] Config path set to `apps/mobile/netlify.toml`
 - [ ] Build command set to `npm run export:web`
 - [ ] Publish directory set to `apps/mobile/dist`
 - [ ] `EXPO_PUBLIC_API_BASE_URL` set to deployed web URL

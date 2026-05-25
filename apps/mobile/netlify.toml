@@ -1,0 +1,9 @@
+[build]
+  base = "apps/mobile"
+  command = "npm run export:web"
+  publish = "apps/mobile/dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
