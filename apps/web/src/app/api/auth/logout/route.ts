@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { corsPreflight, withCors } from "@/app/api/auth/cors";
 import { AUTH_COOKIE_NAME } from "@/auth/session";
 
-export async function POST() {
+export async function POST(request: Request) {
   const response = NextResponse.json({ ok: true });
   response.cookies.set(AUTH_COOKIE_NAME, "", {
     httpOnly: true,
@@ -12,5 +13,9 @@ export async function POST() {
     maxAge: 0,
   });
 
-  return response;
+  return withCors(request, response);
+}
+
+export async function OPTIONS(request: Request) {
+  return corsPreflight(request);
 }

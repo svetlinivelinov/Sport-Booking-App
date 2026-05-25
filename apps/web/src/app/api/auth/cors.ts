@@ -22,6 +22,15 @@ function resolveAllowedOrigin(request: Request): string | null {
     return origin;
   }
 
+  const configuredOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (configuredOrigins.includes(origin)) {
+    return origin;
+  }
+
   if (DEFAULT_DEV_ORIGINS.has(origin)) {
     return origin;
   }

@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME } from "@/auth/session";
 import { signAuthToken } from "@/auth/jwt";
 import { hashPassword } from "@/auth/password";
+import { corsPreflight, withCors } from "@/app/api/auth/cors";
 import { db } from "@/db/client";
 import { users } from "@/db/schema";
 
@@ -23,16 +24,19 @@ export async function POST(request: Request) {
   const displayName = body.displayName?.trim();
 
   if (!email || !password || !displayName) {
-    return NextResponse.json({ error: "email, password, and displayName are required" }, { status: 400 });
+    return withCors(
+      request,
+      NextResponse.json({ error: "email, password, and displayName are required" }, { status: 400 }),
+    );
   }
 
   if (password.length < 8) {
-    return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+    return withCors(request, NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 }));
   }
 
   const existing = await db.query.users.findFirst({ where: eq(users.email, email) });
   if (existing) {
-    return NextResponse.json({ error: "Email already in use" }, { status: 409 });
+    return withCors(request, NextResponse.json({ error: "Email already in use" }, { status: 409 }));
   }
 
   const passwordHash = await hashPassword(password);
@@ -68,5 +72,9 @@ export async function POST(request: Request) {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  return response;
+  return withCors(request, response);
+}
+
+export async function OPTIONS(request: Request) {
+  return corsPreflight(request);
 }

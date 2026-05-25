@@ -5,6 +5,7 @@ This document defines the minimum steps to complete the final plan item: paging,
 ## Pre-Netlify TODO (Must Pass)
 
 - [ ] Set Netlify env vars for `apps/web`: `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`.
+- [ ] Set Netlify env vars for `apps/web`: `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`, `CORS_ALLOWED_ORIGINS`.
 - [ ] Run production DB migrations against Neon before first production traffic.
 - [ ] Confirm Netlify web settings:
    - Base directory: `apps/web`
@@ -22,6 +23,7 @@ This document defines the minimum steps to complete the final plan item: paging,
 
 - `DATABASE_URL`: Neon Postgres connection string
 - `JWT_SECRET`: random long secret for auth signing
+- `CORS_ALLOWED_ORIGINS`: comma-separated allowed browser origins for cross-origin API access (for example `https://sport-bookings-mobile.netlify.app`)
 
 Create `apps/web/.env` for local development, starting from `apps/web/.env.example`.
 
@@ -111,6 +113,7 @@ Create a Netlify site connected to this repository with these settings:
    - `DATABASE_URL` (from Neon)
    - `JWT_SECRET` (strong random secret)
    - `NODE_ENV=production`
+   - `CORS_ALLOWED_ORIGINS=https://sport-bookings-mobile.netlify.app`
 5. Deploy and validate:
    - `/api/health`
    - `/api/sessions?page=1&pageSize=20`
@@ -122,6 +125,7 @@ Web site checklist:
 - [ ] `DATABASE_URL` set
 - [ ] `JWT_SECRET` set
 - [ ] `NODE_ENV=production` set
+- [ ] `CORS_ALLOWED_ORIGINS=https://sport-bookings-mobile.netlify.app` set
 - [ ] First deploy succeeded
 - [ ] `https://<web-url>/api/health` returns OK
 - [ ] `https://<web-url>/api/sessions?page=1&pageSize=20` returns data with auth token
