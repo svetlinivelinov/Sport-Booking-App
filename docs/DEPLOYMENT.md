@@ -130,19 +130,23 @@ Web site checklist:
 
 If you want the Expo web build hosted on Netlify as a separate frontend:
 
-1. Run `npm run build:mobile:web`.
-2. Create a second Netlify site.
-3. Build settings:
-   - Base directory: leave empty (repo root)
-   - Build command: `npm run build:mobile:web`
+1. Create a second Netlify site connected to this same repository and `main` branch.
+2. Build settings:
+   - Base directory: `apps/mobile`
+   - Build command: `npm run export:web`
    - Publish directory: `apps/mobile/dist`
-4. Set `EXPO_PUBLIC_API_BASE_URL` to your deployed Next.js URL.
-5. Redeploy mobile site after changing API base URL.
+3. Set `EXPO_PUBLIC_API_BASE_URL` to your deployed Next.js URL.
+4. Redeploy mobile site after changing API base URL.
+5. Verify login and sessions list from the deployed mobile URL.
+
+Static hosting note:
+
+- Add `apps/mobile/public/_redirects` with `/* /index.html 200` to keep SPA route refreshes working.
 
 Mobile site checklist:
 
 - [ ] Netlify mobile site created
-- [ ] Build command set to `npm run build:mobile:web`
+- [ ] Build command set to `npm run export:web`
 - [ ] Publish directory set to `apps/mobile/dist`
 - [ ] `EXPO_PUBLIC_API_BASE_URL` set to deployed web URL
 - [ ] Deploy succeeded and app loads
