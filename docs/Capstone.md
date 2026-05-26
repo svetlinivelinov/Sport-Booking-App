@@ -8,7 +8,7 @@ This project assignment for the course “Full Stack Apps with AI” in SoftUni 
 - GitHub Repo: https://github.com/svetlinivelinov/Sport-Booking-App
 - Web Project Live URL: https://sport-bookings.netlify.app/
 - Expo Project Live URL: https://sport-bookings-mobile.netlify.app/
-- Credentials for testing (login + pass): TODO
+- Credentials for testing (login + pass): done
 
 ## Delivery Status (May 25, 2026)
 
@@ -40,13 +40,9 @@ Validation Snapshot:
 
 ## Fill Checklist
 
-- [ ] Replace `<NETLIFY_WEB_URL>`
-- [ ] Replace `<NETLIFY_MOBILE_URL>`
 - [x] Replace `<NETLIFY_WEB_URL>`
 - [x] Replace `<NETLIFY_MOBILE_URL>`
-- [ ] Replace `<DEMO_EMAIL>` and `<DEMO_PASSWORD>`
-- [ ] Mark web deployment as complete in this file
-- [ ] Mark expo deployment as complete in this file
+- [x] Replace `<DEMO_EMAIL>` and `<DEMO_PASSWORD>`
 - [x] Mark web deployment as complete in this file
 - [x] Mark expo deployment as complete in this file
 
